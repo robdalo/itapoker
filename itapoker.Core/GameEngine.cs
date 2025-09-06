@@ -18,6 +18,8 @@ public class GameEngine : IGameEngine
 
     public NewGameResponse NewGame(NewGameRequest request)
     {
+        _gameRepo.Truncate();
+        
         var game = new Game
         {
             GameId = Guid.NewGuid().ToString(),

@@ -7,4 +7,5 @@ public interface IGameRepo
     Game AddOrUpdate(Game game);
     Game Get(int id);
     Game GetByGameId(string gameId);
+    void Truncate();
 }

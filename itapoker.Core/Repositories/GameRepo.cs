@@ -39,7 +39,7 @@ public class GameRepo : IGameRepo
 
         return collection.FindById(id);
     }
-    
+
     public Game GetByGameId(string gameId)
     {
         using var context = new LiteDatabase(DatabaseName);
@@ -47,5 +47,14 @@ public class GameRepo : IGameRepo
         var collection = context.GetCollection<Game>();
 
         return collection.FindOne(x => x.GameId == gameId);
+    }
+
+    public void Truncate()
+    {
+        using var context = new LiteDatabase(DatabaseName);
+
+        var collection = context.GetCollection<Game>();
+
+        collection.DeleteAll();
     }
 }

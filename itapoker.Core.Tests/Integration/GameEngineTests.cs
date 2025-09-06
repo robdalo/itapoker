@@ -2,18 +2,19 @@ using FluentAssertions;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Models.Enums;
 using itapoker.Core.Models.Requests;
-using itapoker.Core.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace itapoker.Core.Tests.Integration;
 
-public class GameEngineTests
+public class GameEngineTests : TestBase
 {
     private IGameEngine _gameEngine;
 
     [SetUp]
     public void Setup()
     {
-        _gameEngine = new GameEngine(new GameRepo());
+        var provider = GetServiceProvider();
+        _gameEngine = provider.GetRequiredService<IGameEngine>();
     }
 
     [Test]
