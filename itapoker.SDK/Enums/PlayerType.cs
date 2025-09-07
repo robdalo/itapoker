@@ -1,4 +1,4 @@
-namespace itapoker.Core.Models.Enums;
+namespace itapoker.SDK.Enums;
 
 public enum PlayerType
 {

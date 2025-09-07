@@ -1,1 +1,6 @@
 <h2>High Scores</h2>
+<ul>
+  <li *ngFor="let highScore of highScores">
+    {{ highScore.player }}: {{ highScore.score }}
+  </li>
+</ul>

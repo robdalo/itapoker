@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using itapoker.Core.Models;
-using itapoker.Core.Models.Enums;
+using itapoker.Core.Domain.Models;
+using itapoker.Core.Domain.Enums;
 using itapoker.Core.Repositories;
 using itapoker.Core.Repositories.Interfaces;
 

@@ -1,4 +1,6 @@
-namespace itapoker.Core.Models.Responses;
+using itapoker.Core.Domain.Models;
+
+namespace itapoker.Core.Domain.Responses;
 
 public class NewGameResponse
 {

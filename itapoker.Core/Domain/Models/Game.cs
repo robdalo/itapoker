@@ -1,6 +1,6 @@
-using itapoker.Core.Models.Enums;
+using itapoker.Core.Domain.Enums;
 
-namespace itapoker.Core.Models;
+namespace itapoker.Core.Domain.Models;
 
 public class Game
 {

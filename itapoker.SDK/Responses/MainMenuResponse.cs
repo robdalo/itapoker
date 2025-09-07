@@ -1,4 +1,4 @@
-﻿namespace itapoker.Core.Models.Responses;
+﻿namespace itapoker.SDK.Responses;
 
 public class MainMenuResponse
 {

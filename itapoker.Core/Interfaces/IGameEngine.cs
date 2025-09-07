@@ -1,9 +1,10 @@
-using itapoker.Core.Models.Requests;
-using itapoker.Core.Models.Responses;
+using itapoker.Core.Domain.Requests;
+using itapoker.Core.Domain.Responses;
 
 namespace itapoker.Core.Interfaces;
 
 public interface IGameEngine
 {
     NewGameResponse NewGame(NewGameRequest request);
+    void UpdateHighScores();
 }

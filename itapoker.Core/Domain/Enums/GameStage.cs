@@ -1,4 +1,4 @@
-namespace itapoker.Core.Models.Enums;
+namespace itapoker.Core.Domain.Enums;
 
 public enum GameStage
 {

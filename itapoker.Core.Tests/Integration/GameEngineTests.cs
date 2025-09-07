@@ -1,7 +1,7 @@
 using FluentAssertions;
 using itapoker.Core.Interfaces;
-using itapoker.Core.Models.Enums;
-using itapoker.Core.Models.Requests;
+using itapoker.Core.Domain.Enums;
+using itapoker.Core.Domain.Requests;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace itapoker.Core.Tests.Integration;
@@ -20,7 +20,8 @@ public class GameEngineTests : TestBase
     [Test]
     public void NewGame()
     {
-        var request = new NewGameRequest {
+        var request = new NewGameRequest
+        {
             PlayerName = "Player A",
             Ante = 10,
             Cash = 500,
@@ -34,5 +35,11 @@ public class GameEngineTests : TestBase
         response.Limit.Should().Be(request.Limit);
         response.Players.First(x => x.PlayerType == PlayerType.Human).Name.Should().Be(request.PlayerName);
         response.Players.First(x => x.PlayerType == PlayerType.Computer).Name.Should().Be("AI Player");
+    }
+    
+    [Test]
+    public void UpdateHighScores()
+    {
+        _gameEngine.UpdateHighScores();
     }
 }

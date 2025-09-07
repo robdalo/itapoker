@@ -1,4 +1,4 @@
-namespace itapoker.Core.Models.Requests;
+namespace itapoker.Core.Domain.Requests;
 
 public class NewGameRequest
 {

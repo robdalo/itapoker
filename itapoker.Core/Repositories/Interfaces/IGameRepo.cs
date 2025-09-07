@@ -1,4 +1,4 @@
-using itapoker.Core.Models;
+using itapoker.Core.Domain.Models;
 
 namespace itapoker.Core.Repositories.Interfaces;
 
