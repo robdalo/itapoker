@@ -1,11 +1,7 @@
-using System.Reflection.Metadata.Ecma335;
-using AutoMapper;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories;
 using itapoker.Core.Repositories.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace itapoker.Core.Extensions;
 

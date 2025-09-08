@@ -1,0 +1,4 @@
+.single-player-container { padding: 32px; text-align: center; }
+
+input { margin-bottom: 32px; padding: 8px; background: black; color: grey; font-size: 200%; font-weight: bold; text-align: center; text-transform: uppercase; }
+button { width: 500px; margin: auto; margin-top: 12px; padding: 32px; background: black; color: red; display: block; font-size: 200%; font-weight: bold; text-align: center; text-transform: uppercase; cursor: pointer; }

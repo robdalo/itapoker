@@ -1,1 +1,8 @@
-html, body { background: green; color: white; }
+html, body, h1, h2, h3, h4, h5, ul, li, p, input, button { margin: 0; padding: 0; border: 0; }
+
+main { margin: auto; width: 900px; height: 700px; background: green; color: white; }
+h1 { margin: 0; padding: 24px; font-size: 400%; font-weight: bold; text-align: center; }
+h2 { margin: 0; padding: 12px; font-size: 200%; font-weight: bold; text-align: center; text-transform: uppercase; }
+
+.color-black { color: black; }
+.color-red { color: red; }

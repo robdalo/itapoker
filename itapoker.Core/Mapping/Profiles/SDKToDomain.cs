@@ -7,6 +7,8 @@ public class SDKToDomain : Profile
 {
     public SDKToDomain()
     {
+        CreateMap<SDK.Requests.NewGameRequest, Domain.Requests.NewGameRequest>();
+
         CreateMap<SDK.Responses.HighScoreResponse, Domain.Responses.HighScoreResponse>();
         CreateMap<SDK.Responses.MainMenuResponse, Domain.Responses.MainMenuResponse>();
         CreateMap<SDK.Responses.NewGameResponse, Domain.Responses.NewGameResponse>();
