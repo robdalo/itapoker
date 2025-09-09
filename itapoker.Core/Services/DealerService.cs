@@ -35,7 +35,15 @@ public class DealerService : IDealerService
 
         var random = new Random();
 
-        game.Deck = random.GetItems(Deck.Cards.ToArray(), Deck.Cards.Count).ToList();
+        var cards = Deck.Cards;
+        var total = Deck.Cards.Count;
+
+        for (var i = 0; i < total; i++)
+        {
+            var index = random.Next(0, cards.Count - 1);
+            game.Deck.Add(cards[index]);
+            cards.RemoveAt(index);
+        }
 
         _gameRepo.AddOrUpdate(game);
     }

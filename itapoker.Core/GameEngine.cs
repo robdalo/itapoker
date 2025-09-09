@@ -41,6 +41,17 @@ public class GameEngine : IGameEngine
         };
     }
 
+    public BetResponse Bet(BetRequest request)
+    {
+        _playerService.Bet(request.GameId, request.BetType, request.Amount);
+        _aiPlayerService.Bet(request.GameId, request.BetType, request.Amount);
+
+        return new()
+        {
+
+        };
+    }
+
     public DealResponse Deal(DealRequest request)
     {
         _dealerService.Shuffle(request.GameId);
@@ -48,7 +59,8 @@ public class GameEngine : IGameEngine
 
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        return new() {
+        return new()
+        {
             Cards = game.Players.First(x => x.PlayerType == PlayerType.Human).Cards
         };
     }
