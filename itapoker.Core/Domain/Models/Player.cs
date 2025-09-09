@@ -9,4 +9,5 @@ public class Player
     public string PlayerId { get; set; }
     public PlayerType PlayerType { get; set; }
     public int Cash { get; set; }
+    public List<Card> Cards { get; set; } = new();
 }

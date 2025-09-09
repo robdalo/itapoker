@@ -1,8 +1,8 @@
-using itapoker.SDK.Models;
+using itapoker.Core.Domain.Models;
 
-namespace itapoker.SDK.Responses;
+namespace itapoker.Core.Domain.Responses;
 
-public class NewGameResponse
+public class SinglePlayerResponse
 {
     public string GameId { get; set; }
     public int Cash { get; set; }

@@ -1,6 +1,6 @@
 namespace itapoker.SDK.Requests;
 
-public class NewGameRequest
+public class SinglePlayerRequest
 {
     public string PlayerName { get; set; }
     public int Cash { get; set; }

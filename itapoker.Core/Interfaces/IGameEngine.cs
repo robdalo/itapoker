@@ -5,6 +5,8 @@ namespace itapoker.Core.Interfaces;
 
 public interface IGameEngine
 {
-    NewGameResponse NewGame(NewGameRequest request);
+    AnteUpResponse AnteUp(AnteUpRequest request);
+    DealResponse Deal(DealRequest request);
+    SinglePlayerResponse SinglePlayer(SinglePlayerRequest request);
     void UpdateHighScores();
 }

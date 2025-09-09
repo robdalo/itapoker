@@ -17,18 +17,34 @@ public class ApiConsumer
         _restConsumer = new RestConsumer(baseUrl);
     }
 
+    public async Task<AnteUpResponse> AnteUpAsync(AnteUpRequest request)
+    {
+        return await _restConsumer.PostAsync<AnteUpResponse>(
+            endpoint: ApiEndpoints.AnteUp,
+            authToken: AuthToken,
+            payload: request);
+    }
+
+    public async Task<DealResponse> DealAsync(DealRequest request)
+    {
+        return await _restConsumer.PostAsync<DealResponse>(
+            endpoint: ApiEndpoints.Deal,
+            authToken: AuthToken,
+            payload: request);
+    }
+
     public async Task<List<HighScore>> GetHighScoresAsync()
     {
         return await _restConsumer.GetAsync<List<HighScore>>(
-            endpoint: ApiEndpoints.GetHighScores,
+            endpoint: ApiEndpoints.HighScores,
             authToken: AuthToken);
     }
 
-    public async Task<NewGameResponse> SinglePlayerAsync(NewGameRequest request)
+    public async Task<SinglePlayerResponse> SinglePlayerAsync(SinglePlayerRequest request)
     {
-        return await _restConsumer.PostAsync<NewGameResponse>(
-            endpoint: ApiEndpoints.NewGame, 
+        return await _restConsumer.PostAsync<SinglePlayerResponse>(
+            endpoint: ApiEndpoints.SinglePlayer, 
             authToken: AuthToken,
             payload: request);
-    }    
+    }
 }

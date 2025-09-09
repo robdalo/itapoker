@@ -19,6 +19,34 @@ public class GameEngineTests
     [Test]
     public async Task SinglePlayerAsync()
     {
+        var gameId = await VerifySinglePlayerAsync();
+        
+        await VerifyAnteUpAsync(gameId);
+        await VerifyDealAsync(gameId);
+    }
+
+    private async Task VerifyAnteUpAsync(string gameId)
+    {
+        // ante up
+
+        var response = await _apiConsumer.AnteUpAsync(new() { GameId = gameId });
+
+        response.Pot.Should().Be(100);
+    }
+
+    private async Task VerifyDealAsync(string gameId)
+    {
+        // deal
+
+        var response = await _apiConsumer.DealAsync(new() {
+            GameId = gameId
+        });
+
+        response.Cards.Should().HaveCount(5);
+    }
+
+    private async Task<string> VerifySinglePlayerAsync()
+    {
         // create new single player game
 
         var playerName = "itaboi";
@@ -41,7 +69,7 @@ public class GameEngineTests
         response.Limit.Should().Be(limit);
         response.Players.First(x => x.PlayerType == PlayerType.Human).Name.Should().Be(playerName);
         response.Players.First(x => x.PlayerType == PlayerType.Computer).Name.Should().Be("AI Player");
-        
-        
+
+        return response.GameId;
     }
 }

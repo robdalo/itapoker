@@ -1,6 +1,6 @@
 using itapoker.Core.Interfaces;
-using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Enums;
+using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Requests;
 using itapoker.Core.Domain.Responses;
 using itapoker.Core.Repositories.Interfaces;
@@ -11,14 +11,49 @@ public class GameEngine : IGameEngine
 {
     private readonly IGameRepo _gameRepo;
     private readonly IHighScoreRepo _highScoreRepo;
+    private readonly IAIPlayerService _aiPlayerService;
+    private readonly IDealerService _dealerService;
+    private readonly IPlayerService _playerService;
 
-    public GameEngine(IGameRepo gameRepo, IHighScoreRepo highScoreRepo)
+    public GameEngine(
+        IAIPlayerService aiPlayerService,
+        IDealerService dealerService,
+        IGameRepo gameRepo,
+        IHighScoreRepo highScoreRepo,
+        IPlayerService playerService)
     {
+        _aiPlayerService = aiPlayerService;
+        _dealerService = dealerService;
         _gameRepo = gameRepo;
         _highScoreRepo = highScoreRepo;
+        _playerService = playerService;
     }
 
-    public NewGameResponse NewGame(NewGameRequest request)
+    public AnteUpResponse AnteUp(AnteUpRequest request)
+    {
+        _playerService.AnteUp(request.GameId);
+        _aiPlayerService.AnteUp(request.GameId);
+
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        return new() {
+            Pot = game.Pot
+        };
+    }
+
+    public DealResponse Deal(DealRequest request)
+    {
+        _dealerService.Shuffle(request.GameId);
+        _dealerService.Deal(request.GameId);
+
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        return new() {
+            Cards = game.Players.First(x => x.PlayerType == PlayerType.Human).Cards
+        };
+    }
+
+    public SinglePlayerResponse SinglePlayer(SinglePlayerRequest request)
     {
         _gameRepo.Truncate();
 

@@ -1,6 +1,7 @@
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories;
 using itapoker.Core.Repositories.Interfaces;
+using itapoker.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace itapoker.Core.Extensions;
@@ -17,7 +18,11 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IGameRepo, GameRepo>();
         services.AddSingleton<IHighScoreRepo, HighScoreRepo>();
-        
+
+        services.AddSingleton<IAIPlayerService, AIPlayerService>();
+        services.AddSingleton<IDealerService, DealerService>();
+        services.AddSingleton<IPlayerService, PlayerService>();
+
         services.AddSingleton<IGameEngine, GameEngine>();
 
         return services;

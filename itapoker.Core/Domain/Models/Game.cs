@@ -10,5 +10,7 @@ public class Game
     public int Ante { get; set; }
     public int Cash { get; set; }
     public int Limit { get; set; }
+    public int Pot { get; set; }
     public List<Player> Players { get; set; } = new();
+    public List<Card> Deck { get; set; } = new();
 }
