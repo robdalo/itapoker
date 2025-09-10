@@ -8,19 +8,19 @@ namespace itapoker.Core;
 
 public class GameEngine : IGameEngine
 {
-    private readonly IDecisionService _aiPlayerService;
     private readonly IDealerService _dealerService;
+    private readonly IDecisionService _decisionService;    
     private readonly IGameRepo _gameRepo;
     private readonly IHighScoreRepo _highScoreRepo;
 
     public GameEngine(
-        IDecisionService aiPlayerService,
         IDealerService dealerService,
+        IDecisionService decisionService,        
         IGameRepo gameRepo,
         IHighScoreRepo highScoreRepo)
     {
-        _aiPlayerService = aiPlayerService;
         _dealerService = dealerService;
+        _decisionService = decisionService;        
         _gameRepo = gameRepo;
         _highScoreRepo = highScoreRepo;
     }
@@ -105,9 +105,9 @@ public class GameEngine : IGameEngine
 
             // we need to implement some ai logic that will
             // determine the ai players decision regarding which
-            // type of bet to make
+            // type of bet to make - this will reside in decisionService
 
-            var betType = _aiPlayerService.GetBetType(game);
+            var betType = _decisionService.GetBetType(game);
 
             if (betType == BetType.Fold)
             {
