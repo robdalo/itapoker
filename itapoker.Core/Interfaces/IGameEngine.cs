@@ -1,13 +1,12 @@
+using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Requests;
-using itapoker.Core.Domain.Responses;
 
 namespace itapoker.Core.Interfaces;
 
 public interface IGameEngine
 {
-    AnteUpResponse AnteUp(AnteUpRequest request);
-    BetResponse Bet(BetRequest request);
-    DealResponse Deal(DealRequest request);
-    SinglePlayerResponse SinglePlayer(SinglePlayerRequest request);
-    void UpdateHighScores();
+    Game AnteUp(AnteUpRequest request);
+    Game Bet(BetRequest request);
+    Game Deal(DealRequest request);
+    Game SinglePlayer(SinglePlayerRequest request);
 }

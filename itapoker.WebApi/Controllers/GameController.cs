@@ -33,9 +33,20 @@ public class GameController : ControllerBase
     {
         var mapped = _mapper.Map<Domain.Requests.AnteUpRequest>(request);
 
-        var response = _gameEngine.AnteUp(mapped);
+        var game = _gameEngine.AnteUp(mapped);
 
-        return Ok(_mapper.Map<SDK.Responses.AnteUpResponse>(response));
+        return Ok(_mapper.Map<Game>(game));
+    }
+
+    [HttpPost]
+    [Route("bet")]
+    public IActionResult Bet(SDK.Requests.BetRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.BetRequest>(request);
+
+        var game = _gameEngine.Bet(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
     }
 
     [HttpPost]
@@ -44,14 +55,14 @@ public class GameController : ControllerBase
     {
         var mapped = _mapper.Map<Domain.Requests.DealRequest>(request);
 
-        var response = _gameEngine.Deal(mapped);
+        var game = _gameEngine.Deal(mapped);
 
-        return Ok(_mapper.Map<SDK.Responses.DealResponse>(response));
+        return Ok(_mapper.Map<Game>(game));
     }
 
     [HttpGet]
     [Route("highscores")]
-    public IActionResult Get()
+    public IActionResult HighScores()
     {
         return Ok(_mapper.Map<List<HighScore>>(_highScoreRepo.Get()));
     }
@@ -62,8 +73,8 @@ public class GameController : ControllerBase
     {
         var mapped = _mapper.Map<Domain.Requests.SinglePlayerRequest>(request);
 
-        var response = _gameEngine.SinglePlayer(mapped);
+        var game = _gameEngine.SinglePlayer(mapped);
 
-        return Ok(_mapper.Map<SDK.Responses.SinglePlayerResponse>(response));
+        return Ok(_mapper.Map<Game>(game));
     }
 }

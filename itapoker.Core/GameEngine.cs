@@ -1,76 +1,186 @@
-using itapoker.Core.Interfaces;
 using itapoker.Core.Domain.Enums;
 using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Requests;
-using itapoker.Core.Domain.Responses;
+using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
 
 namespace itapoker.Core;
 
 public class GameEngine : IGameEngine
 {
+    private readonly IDecisionService _aiPlayerService;
+    private readonly IDealerService _dealerService;
     private readonly IGameRepo _gameRepo;
     private readonly IHighScoreRepo _highScoreRepo;
-    private readonly IAIPlayerService _aiPlayerService;
-    private readonly IDealerService _dealerService;
-    private readonly IPlayerService _playerService;
 
     public GameEngine(
-        IAIPlayerService aiPlayerService,
+        IDecisionService aiPlayerService,
         IDealerService dealerService,
         IGameRepo gameRepo,
-        IHighScoreRepo highScoreRepo,
-        IPlayerService playerService)
+        IHighScoreRepo highScoreRepo)
     {
         _aiPlayerService = aiPlayerService;
         _dealerService = dealerService;
         _gameRepo = gameRepo;
         _highScoreRepo = highScoreRepo;
-        _playerService = playerService;
     }
 
-    public AnteUpResponse AnteUp(AnteUpRequest request)
+    public Game AnteUp(AnteUpRequest request)
     {
-        _playerService.AnteUp(request.GameId);
-        _aiPlayerService.AnteUp(request.GameId);
+        // the ante is currently automatically added for each
+        // player in the game based on the ante specified
+        // when creating the game
 
+        _dealerService.AnteUp(request.GameId);
+
+        return _gameRepo.GetByGameId(request.GameId);
+    }
+
+    public Game Bet(BetRequest request)
+    {
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        return new() {
-            Pot = game.Pot
-        };
-    }
+        // let's handle pre draw betting separately from
+        // post draw betting
 
-    public BetResponse Bet(BetRequest request)
-    {
-        _playerService.Bet(request.GameId, request.BetType, request.Amount);
-        _aiPlayerService.Bet(request.GameId, request.BetType, request.Amount);
-
-        return new()
+        if (game.Stage == GameStage.BetPreDraw)
         {
+            // process the player bet first, then the ai player bet
 
-        };
+            if (request.BetType == BetType.Fold)
+            {
+                // if the player is folding, we should end the game
+                // immediately and pay out the ai player
+
+                game.Player.LastBetAmount = 0;
+                game.Player.LastBetType = BetType.Fold;
+
+                game.AIPlayer.Cash += game.Pot;
+
+                game.Pot = 0;
+                game.Stage = GameStage.GameOver;
+            }
+            else if (request.BetType == BetType.Check)
+            {
+                // if the player is checking, the pot remains
+                // unchanged and we pass control to the ai player
+
+                game.Player.LastBetAmount = 0;
+                game.Player.LastBetType = BetType.Check;
+            }
+            else if (request.BetType == BetType.Call)
+            {
+                // if the player is calling, they are matching
+                // the ai players bet and asking to proceed to the draw
+
+                game.Player.LastBetAmount = game.AIPlayer.LastBetAmount;
+                game.Player.LastBetType = BetType.Call;
+                game.Player.Cash -= game.Player.LastBetAmount;
+
+                game.Pot += game.Player.LastBetAmount;
+                game.Stage = GameStage.Draw;
+            }
+            else if (request.BetType == BetType.Raise)
+            {
+                // if the player is raising, they are matching
+                // the previous ai player bet, but then raising the
+                // bet by an amount
+
+                game.Player.LastBetAmount = request.Amount;
+                game.Player.LastBetType = BetType.Raise;
+                game.Player.Cash -= game.AIPlayer.LastBetAmount;
+                game.Player.Cash -= request.Amount;
+
+                game.Pot += game.AIPlayer.LastBetAmount;
+                game.Pot += request.Amount;
+            }
+
+            // if the player is folding or calling, we don't need
+            // to process the ai player bet
+
+            if (request.BetType == BetType.Fold || request.BetType == BetType.Call)
+                return _gameRepo.AddOrUpdate(game);
+
+            // process the ai player bet
+
+            // we need to implement some ai logic that will
+            // determine the ai players decision regarding which
+            // type of bet to make
+
+            var betType = _aiPlayerService.GetBetType(game);
+
+            if (betType == BetType.Fold)
+            {
+                // if the ai player is folding, we should end the game
+                // immediately and pay out the player
+
+                game.AIPlayer.LastBetAmount = 0;
+                game.AIPlayer.LastBetType = BetType.Fold;
+
+                game.Player.Cash += game.Pot;
+
+                game.Pot = 0;
+                game.Stage = GameStage.GameOver;
+            }
+            else if (betType == BetType.Check)
+            {
+                // if the ai player is checking, the pot remains
+                // unchanged, the betting round ends and we proceed
+                // to the draw
+
+                game.AIPlayer.LastBetAmount = 0;
+                game.AIPlayer.LastBetType = BetType.Check;
+
+                game.Stage = GameStage.Draw;
+            }
+            else if (request.BetType == BetType.Call)
+            {
+                // if the ai player is calling, they are matching
+                // the player bet and asking to proceed to the draw
+
+                game.AIPlayer.LastBetAmount = game.Player.LastBetAmount;
+                game.AIPlayer.LastBetType = BetType.Call;
+                game.AIPlayer.Cash -= game.AIPlayer.LastBetAmount;
+
+                game.Pot += game.AIPlayer.LastBetAmount;
+                game.Stage = GameStage.Draw;
+            }
+            else if (request.BetType == BetType.Raise)
+            {
+                // if the ai player is raising, they are matching
+                // the previous player bet, but then raising the
+                // bet by an amount
+
+                game.AIPlayer.LastBetAmount = request.Amount;
+                game.AIPlayer.LastBetType = BetType.Raise;
+                game.AIPlayer.Cash -= game.Player.LastBetAmount;
+                game.AIPlayer.Cash -= request.Amount;
+
+                game.Pot += game.Player.LastBetAmount;
+                game.Pot += request.Amount;
+            }
+        }
+
+        return _gameRepo.AddOrUpdate(game);
     }
 
-    public DealResponse Deal(DealRequest request)
+    public Game Deal(DealRequest request)
     {
+        // dealer shuffles the deck and then distributes
+        // five cards to each player, one card to each player
+        // at a time
+
         _dealerService.Shuffle(request.GameId);
         _dealerService.Deal(request.GameId);
 
-        var game = _gameRepo.GetByGameId(request.GameId);
-
-        return new()
-        {
-            Cards = game.Players.First(x => x.PlayerType == PlayerType.Human).Cards
-        };
+        return _gameRepo.GetByGameId(request.GameId);
     }
 
-    public SinglePlayerResponse SinglePlayer(SinglePlayerRequest request)
+    public Game SinglePlayer(SinglePlayerRequest request)
     {
         _gameRepo.Truncate();
 
-        var game = new Game
-        {
+        var game = new Game {
             GameId = Guid.NewGuid().ToString(),
             Stage = GameStage.NewGame,
             Ante = request.Ante,
@@ -92,41 +202,6 @@ public class GameEngine : IGameEngine
             }
         };
 
-        game = _gameRepo.AddOrUpdate(game);
-
-        return new()
-        {
-            GameId = game.GameId,
-            Ante = game.Ante,
-            Cash = game.Cash,
-            Limit = game.Limit,
-            Players = game.Players
-        };
-    }
-
-    public void UpdateHighScores()
-    {
-        _highScoreRepo.AddOrUpdate(new HighScore
-        {
-            PlayerName = "Player A",
-            Score = 25000
-        });
-
-        _highScoreRepo.AddOrUpdate(new HighScore
-        {
-            PlayerName = "Player B",
-            Score = 35000
-        });
-
-        _highScoreRepo.AddOrUpdate(new HighScore
-        {
-            PlayerName = "Player C",
-            Score = 75000
-        });
-        
-        _highScoreRepo.AddOrUpdate(new HighScore {
-            PlayerName = "Player D",
-            Score = 5000
-        });        
+        return _gameRepo.AddOrUpdate(game);
     }
 }

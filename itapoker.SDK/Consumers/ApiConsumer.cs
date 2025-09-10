@@ -1,6 +1,5 @@
 using itapoker.SDK.Models;
 using itapoker.SDK.Requests;
-using itapoker.SDK.Responses;
 using itapoker.Shared.Config;
 using itapoker.Shared.Consumers;
 
@@ -17,32 +16,40 @@ public class ApiConsumer
         _restConsumer = new RestConsumer(baseUrl);
     }
 
-    public async Task<AnteUpResponse> AnteUpAsync(AnteUpRequest request)
+    public async Task<Game> AnteUpAsync(AnteUpRequest request)
     {
-        return await _restConsumer.PostAsync<AnteUpResponse>(
+        return await _restConsumer.PostAsync<Game>(
             endpoint: ApiEndpoints.AnteUp,
             authToken: AuthToken,
             payload: request);
     }
 
-    public async Task<DealResponse> DealAsync(DealRequest request)
+    public async Task<Game> BetAsync(AnteUpRequest request)
     {
-        return await _restConsumer.PostAsync<DealResponse>(
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.Bet,
+            authToken: AuthToken,
+            payload: request);
+    }
+
+    public async Task<Game> DealAsync(DealRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
             endpoint: ApiEndpoints.Deal,
             authToken: AuthToken,
             payload: request);
     }
 
-    public async Task<List<HighScore>> GetHighScoresAsync()
+    public async Task<List<HighScore>> HighScoresAsync()
     {
         return await _restConsumer.GetAsync<List<HighScore>>(
             endpoint: ApiEndpoints.HighScores,
             authToken: AuthToken);
     }
 
-    public async Task<SinglePlayerResponse> SinglePlayerAsync(SinglePlayerRequest request)
+    public async Task<Game> SinglePlayerAsync(SinglePlayerRequest request)
     {
-        return await _restConsumer.PostAsync<SinglePlayerResponse>(
+        return await _restConsumer.PostAsync<Game>(
             endpoint: ApiEndpoints.SinglePlayer, 
             authToken: AuthToken,
             payload: request);

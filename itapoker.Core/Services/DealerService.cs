@@ -13,6 +13,19 @@ public class DealerService : IDealerService
         _gameRepo = gameRepo;
     }
 
+    public void AnteUp(string gameId)
+    {
+        var game = _gameRepo.GetByGameId(gameId);
+
+        foreach (var player in game.Players)
+        {
+            player.Cash -= game.Ante;
+            game.Pot += game.Ante;
+        }
+
+        _gameRepo.AddOrUpdate(game);        
+    }
+
     public void Deal(string gameId)
     {
         var game = _gameRepo.GetByGameId(gameId);

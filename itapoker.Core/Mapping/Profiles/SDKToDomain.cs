@@ -11,10 +11,6 @@ public class SDKToDomain : Profile
         CreateMap<SDK.Requests.DealRequest, Domain.Requests.DealRequest>();
         CreateMap<SDK.Requests.SinglePlayerRequest, Domain.Requests.SinglePlayerRequest>();
 
-        CreateMap<SDK.Responses.AnteUpResponse, Domain.Responses.AnteUpResponse>();
-        CreateMap<SDK.Responses.DealResponse, Domain.Responses.DealResponse>();
-        CreateMap<SDK.Responses.SinglePlayerResponse, Domain.Responses.SinglePlayerResponse>();
-
         CreateMap<SDK.Enums.CardRank, Domain.Enums.CardRank>();
         CreateMap<SDK.Enums.CardSuit, Domain.Enums.CardSuit>();
         CreateMap<SDK.Enums.GameStage, Domain.Enums.GameStage>();

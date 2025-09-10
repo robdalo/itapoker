@@ -19,9 +19,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGameRepo, GameRepo>();
         services.AddSingleton<IHighScoreRepo, HighScoreRepo>();
 
-        services.AddSingleton<IAIPlayerService, AIPlayerService>();
+        services.AddSingleton<IDecisionService, DecisionService>();
         services.AddSingleton<IDealerService, DealerService>();
-        services.AddSingleton<IPlayerService, PlayerService>();
 
         services.AddSingleton<IGameEngine, GameEngine>();
 

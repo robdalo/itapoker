@@ -29,20 +29,22 @@ public class GameEngineTests
     {
         // ante up
 
-        var response = await _apiConsumer.AnteUpAsync(new() { GameId = gameId });
+        var game = await _apiConsumer.AnteUpAsync(new() { GameId = gameId });
 
-        response.Pot.Should().Be(100);
+        game.Pot.Should().Be(100);
     }
 
     private async Task VerifyDealAsync(string gameId)
     {
         // deal
 
-        var response = await _apiConsumer.DealAsync(new() {
+        var game = await _apiConsumer.DealAsync(new() {
             GameId = gameId
         });
 
-        response.Cards.Should().HaveCount(5);
+        var player = game.Players.First(x => x.PlayerType == PlayerType.Human);
+
+        player.Cards.Should().HaveCount(5);
     }
 
     private async Task<string> VerifySinglePlayerAsync()
@@ -54,8 +56,7 @@ public class GameEngineTests
         var cash = 1000;
         var limit = 100;
 
-        var response = await _apiConsumer.SinglePlayerAsync(new()
-        {
+        var game = await _apiConsumer.SinglePlayerAsync(new() {
             PlayerName = playerName,
             Ante = ante,
             Cash = cash,
@@ -64,12 +65,12 @@ public class GameEngineTests
 
         // verify new single player game
 
-        response.Ante.Should().Be(ante);
-        response.Cash.Should().Be(cash);
-        response.Limit.Should().Be(limit);
-        response.Players.First(x => x.PlayerType == PlayerType.Human).Name.Should().Be(playerName);
-        response.Players.First(x => x.PlayerType == PlayerType.Computer).Name.Should().Be("AI Player");
+        game.Ante.Should().Be(ante);
+        game.Cash.Should().Be(cash);
+        game.Limit.Should().Be(limit);
+        game.Players.First(x => x.PlayerType == PlayerType.Human).Name.Should().Be(playerName);
+        game.Players.First(x => x.PlayerType == PlayerType.Computer).Name.Should().Be("AI Player");
 
-        return response.GameId;
+        return game.GameId;
     }
 }
