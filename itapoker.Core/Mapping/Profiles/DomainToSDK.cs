@@ -8,9 +8,13 @@ public class DomainToSDK : Profile
     public DomainToSDK()
     {
         CreateMap<Domain.Requests.AnteUpRequest, SDK.Requests.AnteUpRequest>();
+        CreateMap<Domain.Requests.BetRequest, SDK.Requests.BetRequest>();
         CreateMap<Domain.Requests.DealRequest, SDK.Requests.DealRequest>();
+        CreateMap<Domain.Requests.DrawRequest, SDK.Requests.DrawRequest>();
+        CreateMap<Domain.Requests.ShowdownRequest, SDK.Requests.ShowdownRequest>();
         CreateMap<Domain.Requests.SinglePlayerRequest, SDK.Requests.SinglePlayerRequest>();
 
+        CreateMap<Domain.Enums.BetType, SDK.Enums.BetType>();
         CreateMap<Domain.Enums.CardRank, SDK.Enums.CardRank>();
         CreateMap<Domain.Enums.CardSuit, SDK.Enums.CardSuit>();
         CreateMap<Domain.Enums.GameStage, SDK.Enums.GameStage>();

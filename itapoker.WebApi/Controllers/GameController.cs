@@ -68,6 +68,17 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
+    [Route("showdown")]
+    public IActionResult Showdown(SDK.Requests.ShowdownRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.ShowdownRequest>(request);
+
+        var game = _gameEngine.Showdown(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+    
+    [HttpPost]
     [Route("singleplayer")]
     public IActionResult SinglePlayer(SDK.Requests.SinglePlayerRequest request)
     {

@@ -46,11 +46,19 @@ public class ApiConsumer
             endpoint: ApiEndpoints.HighScores,
             authToken: AuthToken);
     }
+    
+    public async Task<Game> ShowdownAsync(ShowdownRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.Showdown, 
+            authToken: AuthToken,
+            payload: request);
+    }
 
     public async Task<Game> SinglePlayerAsync(SinglePlayerRequest request)
     {
         return await _restConsumer.PostAsync<Game>(
-            endpoint: ApiEndpoints.SinglePlayer, 
+            endpoint: ApiEndpoints.SinglePlayer,
             authToken: AuthToken,
             payload: request);
     }

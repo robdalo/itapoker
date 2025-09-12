@@ -20,6 +20,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IGameRepo, GameRepo>();
         services.AddSingleton<IHighScoreRepo, HighScoreRepo>();
 
+        services.AddSingleton<ICardService, CardService>();
         services.AddSingleton<IDecisionService, DecisionService>();
         services.AddSingleton<IDealerService, DealerService>();
         services.AddSingleton<IValidationService, ValidationService>();
