@@ -2,6 +2,7 @@ using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories;
 using itapoker.Core.Repositories.Interfaces;
 using itapoker.Core.Services;
+using itapoker.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace itapoker.Core.Extensions;
@@ -21,6 +22,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IDecisionService, DecisionService>();
         services.AddSingleton<IDealerService, DealerService>();
+        services.AddSingleton<IValidationService, ValidationService>();
 
         services.AddSingleton<IGameEngine, GameEngine>();
 

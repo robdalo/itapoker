@@ -1,6 +1,6 @@
 using itapoker.Core.Domain.Models;
-using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
+using itapoker.Core.Services.Interfaces;
 
 namespace itapoker.Core.Services;
 
@@ -38,6 +38,15 @@ public class DealerService : IDealerService
                 game.Deck.Remove(game.Deck.Last());
             }
         }
+
+        _gameRepo.AddOrUpdate(game);
+    }
+
+    public void Draw(string gameId, List<Card> cards)
+    {
+        var game = _gameRepo.GetByGameId(gameId);
+
+
 
         _gameRepo.AddOrUpdate(game);
     }

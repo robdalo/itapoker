@@ -8,5 +8,7 @@ public interface IGameEngine
     Game AnteUp(AnteUpRequest request);
     Game Bet(BetRequest request);
     Game Deal(DealRequest request);
+    Game Draw(DrawRequest request);
+    Game Showdown(ShowdownRequest request);
     Game SinglePlayer(SinglePlayerRequest request);
 }

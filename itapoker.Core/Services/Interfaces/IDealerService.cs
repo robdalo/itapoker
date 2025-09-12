@@ -1,4 +1,4 @@
-namespace itapoker.Core.Interfaces;
+namespace itapoker.Core.Services.Interfaces;
 
 public interface IDealerService
 {
