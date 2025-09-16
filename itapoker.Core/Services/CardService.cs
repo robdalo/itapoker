@@ -43,7 +43,7 @@ public class CardService : ICardService
         else if (IsNineHigh(cards))
             return HandType.NineHigh;
         else if (IsEightHigh(cards))
-            return HandType.NineHigh;
+            return HandType.EightHigh;
         else if (IsSevenHigh(cards))
             return HandType.SevenHigh;
         else if (IsSixHigh(cards))
@@ -207,11 +207,10 @@ public class CardService : ICardService
 
         var differences = new List<int>();
 
-        for (var i = 0; i < temp.Count(); i++)
+        for (var i = 0; i < temp.Count() - 1; i++)
             differences.Add(temp[i + 1] - temp[i]);
 
         return
-            cards.GroupBy(x => x.Suit).Count() > 1 &&
             differences.All(x => x == 1);
     }
 
