@@ -1,3 +1,4 @@
+using itapoker.Core.Domain.Enums;
 using itapoker.Core.Domain.Models;
 using itapoker.Core.Repositories.Interfaces;
 using itapoker.Core.Services.Interfaces;
@@ -23,7 +24,9 @@ public class DealerService : IDealerService
             game.Pot += game.Ante;
         }
 
-        _gameRepo.AddOrUpdate(game);        
+        game.Stage = GameStage.Deal;
+
+        _gameRepo.AddOrUpdate(game);
     }
 
     public void Deal(string gameId)
@@ -38,6 +41,8 @@ public class DealerService : IDealerService
                 game.Deck.Remove(game.Deck.Last());
             }
         }
+
+        game.Stage = GameStage.BetPreDraw;
 
         _gameRepo.AddOrUpdate(game);
     }

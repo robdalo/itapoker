@@ -9,17 +9,20 @@ namespace itapoker.Core;
 
 public class GameEngine : IGameEngine
 {
+    private readonly ICardService _cardService;
     private readonly IDealerService _dealerService;
     private readonly IDecisionService _decisionService;
     private readonly IGameRepo _gameRepo;
     private readonly IHighScoreRepo _highScoreRepo;
 
     public GameEngine(
+        ICardService cardService,
         IDealerService dealerService,
         IDecisionService decisionService,
         IGameRepo gameRepo,
         IHighScoreRepo highScoreRepo)
     {
+        _cardService = cardService;
         _dealerService = dealerService;
         _decisionService = decisionService;
         _gameRepo = gameRepo;
@@ -215,13 +218,44 @@ public class GameEngine : IGameEngine
             game.Deck.Remove(game.Deck.Last());
         }
 
+        game.Stage = GameStage.BetPostDraw;
+
         return _gameRepo.AddOrUpdate(game);
+    }
+
+    public Game Next(NextRequest request)
+    {
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        if (game.Stage == GameStage.GameOver)
+        {
+            game.Hand++;
+            game.Stage = GameStage.Ante;
+        }
+
+        return game;
     }
 
     public Game Showdown(ShowdownRequest request)
     {
         var game = _gameRepo.GetByGameId(request.GameId);
-        
+
+        var playerHandType = _cardService.GetHandType(game.Player.Cards);
+        var aiHandType = _cardService.GetHandType(game.AIPlayer.Cards);
+
+        if (playerHandType > aiHandType)
+            game.Player.Cash += game.Pot;
+        else if (aiHandType > playerHandType)
+            game.AIPlayer.Cash += game.Pot;
+        else
+        {
+            game.Player.Cash += game.Pot / 2;
+            game.AIPlayer.Cash += game.Pot / 2;
+        }
+
+        game.Pot = 0;
+        game.Stage = GameStage.GameOver;
+
         return _gameRepo.AddOrUpdate(game);
     }
 
@@ -232,7 +266,7 @@ public class GameEngine : IGameEngine
         var game = new Game
         {
             GameId = Guid.NewGuid().ToString(),
-            Stage = GameStage.NewGame,
+            Stage = GameStage.Ante,
             Ante = request.Ante,
             Cash = request.Cash,
             Limit = request.Limit,

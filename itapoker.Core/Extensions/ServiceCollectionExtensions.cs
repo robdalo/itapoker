@@ -14,7 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(cfg => {
             cfg.AddProfile<DomainToSDK>();
             cfg.AddProfile<SDKToDomain>();
-            cfg.LicenseKey = "<License Key Here>";
+            cfg.LicenseKey = "";
         });
 
         services.AddSingleton<IGameRepo, GameRepo>();

@@ -26,7 +26,9 @@ public class DecisionService : IDecisionService
     {
         var random = new Random();
 
-        var betType = (BetType)(random.Next(1, 4));
+        var betTypes = new List<BetType> { BetType.Call, BetType.Check, BetType.Raise };
+
+        var betType = betTypes[random.Next(0, 2)];
         var amount = 0;
 
         if (betType == BetType.Raise)

@@ -60,11 +60,33 @@ public class GameController : ControllerBase
         return Ok(_mapper.Map<Game>(game));
     }
 
+    [HttpPost]
+    [Route("draw")]
+    public IActionResult Draw(SDK.Requests.DrawRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.DrawRequest>(request);
+
+        var game = _gameEngine.Draw(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+
     [HttpGet]
     [Route("highscores")]
     public IActionResult HighScores()
     {
         return Ok(_mapper.Map<List<HighScore>>(_highScoreRepo.Get()));
+    }
+
+    [HttpPost]
+    [Route("next")]
+    public IActionResult Next(SDK.Requests.NextRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.NextRequest>(request);
+
+        var game = _gameEngine.Next(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
     }
 
     [HttpPost]

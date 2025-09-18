@@ -6,6 +6,7 @@ public class Game
 {
     public int Id { get; set; }
     public string GameId { get; set; }
+    public int Hand { get; set; }
     public GameStage Stage { get; set; }
     public int Ante { get; set; }
     public int Cash { get; set; }

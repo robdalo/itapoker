@@ -11,6 +11,7 @@ public class SDKToDomain : Profile
         CreateMap<SDK.Requests.BetRequest, Domain.Requests.BetRequest>();
         CreateMap<SDK.Requests.DealRequest, Domain.Requests.DealRequest>();
         CreateMap<SDK.Requests.DrawRequest, Domain.Requests.DrawRequest>();
+        CreateMap<SDK.Requests.NextRequest, Domain.Requests.NextRequest>();
         CreateMap<SDK.Requests.ShowdownRequest, Domain.Requests.ShowdownRequest>();
         CreateMap<SDK.Requests.SinglePlayerRequest, Domain.Requests.SinglePlayerRequest>();
 

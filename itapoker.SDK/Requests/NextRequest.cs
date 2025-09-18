@@ -1,6 +1,6 @@
 namespace itapoker.SDK.Requests;
 
-public class ShowdownRequest
+public class NextRequest
 {
     public string GameId { get; set; }
 }

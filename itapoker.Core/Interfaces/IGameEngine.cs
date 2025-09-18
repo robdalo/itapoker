@@ -9,6 +9,7 @@ public interface IGameEngine
     Game Bet(BetRequest request);
     Game Deal(DealRequest request);
     Game Draw(DrawRequest request);
+    Game Next(NextRequest request);
     Game Showdown(ShowdownRequest request);
     Game SinglePlayer(SinglePlayerRequest request);
 }

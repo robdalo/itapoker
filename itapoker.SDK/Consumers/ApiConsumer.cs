@@ -1,3 +1,4 @@
+using System.Runtime.Versioning;
 using itapoker.SDK.Models;
 using itapoker.SDK.Requests;
 using itapoker.Shared.Config;
@@ -24,7 +25,7 @@ public class ApiConsumer
             payload: request);
     }
 
-    public async Task<Game> BetAsync(AnteUpRequest request)
+    public async Task<Game> BetAsync(BetRequest request)
     {
         return await _restConsumer.PostAsync<Game>(
             endpoint: ApiEndpoints.Bet,
@@ -40,6 +41,14 @@ public class ApiConsumer
             payload: request);
     }
 
+    public async Task<Game> DrawAsync(DrawRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.Draw,
+            authToken: AuthToken,
+            payload: request);
+    }
+
     public async Task<List<HighScore>> HighScoresAsync()
     {
         return await _restConsumer.GetAsync<List<HighScore>>(
@@ -47,10 +56,18 @@ public class ApiConsumer
             authToken: AuthToken);
     }
     
+    public async Task<Game> NextAsync(NextRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.Next,
+            authToken: AuthToken,
+            payload: request);
+    }
+    
     public async Task<Game> ShowdownAsync(ShowdownRequest request)
     {
         return await _restConsumer.PostAsync<Game>(
-            endpoint: ApiEndpoints.Showdown, 
+            endpoint: ApiEndpoints.Showdown,
             authToken: AuthToken,
             payload: request);
     }
