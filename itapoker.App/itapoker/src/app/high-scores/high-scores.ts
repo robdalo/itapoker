@@ -16,7 +16,7 @@ export class HighScores {
 
   ngOnInit() {
     this.http
-      .get<any[]>('http://localhost:5174/api/highscores')
+      .get<any[]>('http://localhost:5174/game/highscores')
       .subscribe(data => {
         this.highScores = data;
     });

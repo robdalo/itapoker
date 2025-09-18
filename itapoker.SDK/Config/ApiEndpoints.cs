@@ -8,6 +8,7 @@ public static class ApiEndpoints
     public static string Draw = "game/draw";
     public static string HighScores = "game/highscores";
     public static string Next = "game/next";
+    public static string SetDecision = "game/decision";
     public static string Showdown = "game/showdown";
     public static string SinglePlayer = "game/singleplayer";
 }

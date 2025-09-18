@@ -110,7 +110,7 @@ public class GameEngine : IGameEngine
         // determine the ai players decision regarding which
         // type of bet to make - this will reside in decisionService
 
-        var (betType, amount) = _decisionService.GetBet(game);
+        var (betType, amount) = GetBet(game);
 
         if (betType == BetType.Fold)
         {
@@ -136,7 +136,7 @@ public class GameEngine : IGameEngine
 
             game.Stage = GetNextGameStage(game.Stage);
         }
-        else if (request.BetType == BetType.Call)
+        else if (betType == BetType.Call)
         {
             // if the ai player is calling, they are matching
             // the player bet and asking to proceed to the draw
@@ -149,19 +149,19 @@ public class GameEngine : IGameEngine
 
             game.Stage = GetNextGameStage(game.Stage);
         }
-        else if (request.BetType == BetType.Raise)
+        else if (betType == BetType.Raise)
         {
             // if the ai player is raising, they are matching
             // the previous player bet, but then raising the
             // bet by an amount
 
-            game.AIPlayer.LastBetAmount = request.Amount;
+            game.AIPlayer.LastBetAmount = amount;
             game.AIPlayer.LastBetType = BetType.Raise;
             game.AIPlayer.Cash -= game.Player.LastBetAmount;
             game.AIPlayer.Cash -= amount;
 
             game.Pot += game.Player.LastBetAmount;
-            game.Pot += request.Amount;
+            game.Pot += amount;
         }
 
         return _gameRepo.AddOrUpdate(game);
@@ -233,7 +233,17 @@ public class GameEngine : IGameEngine
             game.Stage = GameStage.Ante;
         }
 
-        return game;
+        return _gameRepo.AddOrUpdate(game);
+    }
+
+    public Game SetDecision(SetDecisionRequest request)
+    {
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        game.NextBetType = request.BetType;
+        game.NextBetAmount = request.Amount;
+
+        return _gameRepo.AddOrUpdate(game);
     }
 
     public Game Showdown(ShowdownRequest request)
@@ -266,6 +276,7 @@ public class GameEngine : IGameEngine
         var game = new Game
         {
             GameId = Guid.NewGuid().ToString(),
+            Hand = 1,
             Stage = GameStage.Ante,
             Ante = request.Ante,
             Cash = request.Cash,
@@ -287,6 +298,22 @@ public class GameEngine : IGameEngine
         };
 
         return _gameRepo.AddOrUpdate(game);
+    }
+
+    private (BetType, int) GetBet(Game game)
+    {
+        if (game.NextBetType.HasValue && game.NextBetAmount.HasValue)
+        {
+            var betType = game.NextBetType.Value;
+            var betAmount = game.NextBetAmount.Value;
+
+            game.NextBetType = null;
+            game.NextBetAmount = null;
+
+            return (betType, betAmount);
+        }
+
+        return _decisionService.GetBet(game);
     }
 
     private GameStage GetNextGameStage(GameStage stage)

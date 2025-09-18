@@ -45,50 +45,68 @@ public class GameEngineTests
 
     private async Task<Game> VerifyBetPreDrawAsync(Game game)
     {
-        // bet
+        // configure the AI player bet
 
-        game = await _apiConsumer.BetAsync(new()
-        {
+        await _apiConsumer.SetDecisionAsync(new() {
+            GameId = game.GameId,
+            BetType = BetType.Raise,
+            Amount = 20
+        });
+
+        // bet - check, AI player will raise by 20
+
+        game = await _apiConsumer.BetAsync(new() {
             GameId = game.GameId,
             BetType = BetType.Check
         });
 
-        if (game.Stage == GameStage.BetPreDraw)
-        {
-            game = await _apiConsumer.BetAsync(new()
-            {
-                GameId = game.GameId,
-                BetType = BetType.Call
-            });
-        }
+        // configure the AI player bet
+        
+        await _apiConsumer.SetDecisionAsync(new() {
+            GameId = game.GameId,
+            BetType = BetType.Raise,
+            Amount = 40
+        });
+
+        // bet - raise by 20, ai player will raise by 40
+
+        game = await _apiConsumer.BetAsync(new() {
+            GameId = game.GameId,
+            BetType = BetType.Raise,
+            Amount = 20
+        });
+
+        // bet - call
+
+         game = await _apiConsumer.BetAsync(new() {
+            GameId = game.GameId,
+            BetType = BetType.Call
+        });
 
         game.Stage.Should().Be(GameStage.Draw);
-        game.Pot.Should().Be(100);
+        game.Pot.Should().Be(260);
 
         return game;
     }
 
     private async Task<Game> VerifyBetPostDrawAsync(Game game)
     {
-        // bet
-
-        game = await _apiConsumer.BetAsync(new()
-        {
+        // configure the AI player bet
+        
+        await _apiConsumer.SetDecisionAsync(new() {
             GameId = game.GameId,
             BetType = BetType.Check
         });
 
-        if (game.Stage == GameStage.BetPostDraw)
-        {
-            game = await _apiConsumer.BetAsync(new()
-            {
-                GameId = game.GameId,
-                BetType = BetType.Call
-            });
-        }
+        // bet - check, ai player will also check
+
+        game = await _apiConsumer.BetAsync(new() {
+            GameId = game.GameId,
+            BetType = BetType.Check
+        });
 
         game.Stage.Should().Be(GameStage.Showdown);
-        game.Pot.Should().Be(100);
+        game.Pot.Should().Be(260);
 
         return game;
     }
@@ -138,6 +156,7 @@ public class GameEngineTests
 
         game.Stage.Should().Be(GameStage.Ante);
         game.Pot.Should().Be(0);
+        game.Hand.Should().Be(2);
 
         return game;
     }

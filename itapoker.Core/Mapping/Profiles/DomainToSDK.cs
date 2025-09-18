@@ -12,6 +12,7 @@ public class DomainToSDK : Profile
         CreateMap<Domain.Requests.DealRequest, SDK.Requests.DealRequest>();
         CreateMap<Domain.Requests.DrawRequest, SDK.Requests.DrawRequest>();
         CreateMap<Domain.Requests.NextRequest, SDK.Requests.NextRequest>();
+        CreateMap<Domain.Requests.SetDecisionRequest, SDK.Requests.SetDecisionRequest>();
         CreateMap<Domain.Requests.ShowdownRequest, SDK.Requests.ShowdownRequest>();
         CreateMap<Domain.Requests.SinglePlayerRequest, SDK.Requests.SinglePlayerRequest>();
 

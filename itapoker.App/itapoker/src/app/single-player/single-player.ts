@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-single-player',
@@ -12,4 +14,35 @@ export class SinglePlayer {
   cash = String();
   ante = String();
   limit = String();
+
+  constructor(
+    private http: HttpClient,
+    private router: Router) {
+  }
+
+  startGameClick() {
+
+    var request = {
+      PlayerName: this.playerName
+    };
+
+    this.http.post("http://localhost:5174/game/singleplayer", request).subscribe(
+      (response) => this.startGameSuccess(response),
+      (error) => this.startGameError(error)
+    );
+  }
+
+  startGameSuccess(response: any) {
+
+    localStorage.setItem("playerName", this.playerName);
+    localStorage.setItem("cash", this.cash);
+    localStorage.setItem("ante", this.ante);
+    localStorage.setItem("limit", this.limit);
+
+    this.router.navigate(['/high-scores']);
+  }
+
+  startGameError(error: any) {
+
+  }
 }

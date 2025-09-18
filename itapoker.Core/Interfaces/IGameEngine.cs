@@ -10,6 +10,7 @@ public interface IGameEngine
     Game Deal(DealRequest request);
     Game Draw(DrawRequest request);
     Game Next(NextRequest request);
+    Game SetDecision(SetDecisionRequest request);
     Game Showdown(ShowdownRequest request);
     Game SinglePlayer(SinglePlayerRequest request);
 }

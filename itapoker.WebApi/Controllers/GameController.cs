@@ -90,6 +90,17 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
+    [Route("decision")]
+    public IActionResult SetDecision(SDK.Requests.SetDecisionRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.SetDecisionRequest>(request);
+
+        var game = _gameEngine.SetDecision(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+
+    [HttpPost]
     [Route("showdown")]
     public IActionResult Showdown(SDK.Requests.ShowdownRequest request)
     {

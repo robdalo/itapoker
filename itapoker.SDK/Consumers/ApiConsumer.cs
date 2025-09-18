@@ -63,6 +63,14 @@ public class ApiConsumer
             authToken: AuthToken,
             payload: request);
     }
+
+    public async Task<Game> SetDecisionAsync(SetDecisionRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.SetDecision,
+            authToken: AuthToken,
+            payload: request);
+    }
     
     public async Task<Game> ShowdownAsync(ShowdownRequest request)
     {
