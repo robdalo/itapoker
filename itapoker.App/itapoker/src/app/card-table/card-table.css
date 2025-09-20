@@ -1,5 +1,5 @@
-.card-table-content img { width: 100px; height: auto; margin-right: 12px; }
+.card-table-content img { width: 100px; height: auto; margin-right: 12px; cursor: pointer; }
 .card-table-chips { padding-top: 9px; text-align: center; }
-.card-table-chips img { width: 45px; height: auto; margin-right: 6px; }
+.card-table-chips img { width: 45px; height: auto; margin-right: 6px; cursor: pointer; }
 
 .ai-player-hand { padding-bottom: 12px; }
