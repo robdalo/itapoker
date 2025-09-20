@@ -1,5 +1,8 @@
-.card-table-content img { width: 100px; height: auto; margin-right: 12px; cursor: pointer; }
 .card-table-chips { padding-top: 9px; text-align: center; }
-.card-table-chips img { width: 45px; height: auto; margin-right: 6px; cursor: pointer; }
-
-.ai-player-hand { padding-bottom: 12px; }
+.card-table-chips img { width: 50px; height: auto; margin-right: 6px; cursor: pointer; }
+.card-table-player-hand { clear: both; display: table; padding-bottom: 32px; text-align: center; }
+.card-table-player-hand div { width: 125px; float: left; }
+.card-table-player-hand div.end { width: 80px; }
+.card-table-player-hand div.end img { width: 50px; height: auto; margin-bottom: -16px; }
+.card-table-player-hand img { width: 110px; height: auto; margin-bottom: 16px; cursor: pointer; }
+.card-table-player-hand span { padding: 8px; background: yellow; color: black; font-weight: bold; }
