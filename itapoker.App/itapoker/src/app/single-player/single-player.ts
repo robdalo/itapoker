@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-single-player',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './single-player.html',
   styleUrl: './single-player.css'
 })
@@ -39,7 +39,7 @@ export class SinglePlayer {
     localStorage.setItem("ante", this.ante);
     localStorage.setItem("limit", this.limit);
 
-    this.router.navigate(['/high-scores']);
+    this.router.navigate(['/card-table']);
   }
 
   startGameError(error: any) {

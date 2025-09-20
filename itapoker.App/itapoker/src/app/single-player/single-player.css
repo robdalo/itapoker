@@ -1,4 +1,6 @@
-.single-player-container { padding: 32px; text-align: center; }
+button { margin-right: 8px; }
+input { margin-bottom: 24px; padding: 16px 0 16px 0; background: limegreen; border-bottom: 8px solid black; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; }
 
-input { margin-bottom: 32px; padding: 8px; background: black; color: grey; font-size: 200%; font-weight: bold; text-align: center; text-transform: uppercase; }
-button { width: 500px; margin: auto; margin-top: 12px; padding: 32px; background: black; color: red; display: block; font-size: 200%; font-weight: bold; text-align: center; text-transform: uppercase; cursor: pointer; }
+.card-table-footer-left { width: 10%; }
+.card-table-footer-centre { width: 80%; }
+.card-table-footer-right { width: 10%; }

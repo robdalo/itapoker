@@ -1,9 +1,21 @@
-<h2>High Scores</h2>
-<ul>
-  <li>1. <span class="color-black">itaboi</span> - <span class="color-red">$25,000</span></li>
-  <li>2. <span class="color-black">gitta</span> - <span class="color-red">$15,000</span></li>
-  <li>3. <span class="color-black">colby</span> - <span class="color-red">$12,000</span></li>
-  <li *ngFor="let highScore of highScores">
-    {{ highScore.player }}: {{ highScore.score }}
-  </li>
-</ul>
+<div class="card-table">
+    <div class="card-table-header">
+        <div class="card-table-header-left"><br /></div>
+        <div class="card-table-header-centre">
+            <h4>High Scores</h4>
+        </div>
+        <div class="card-table-header-right"><br /></div>
+    </div>
+
+    <div class="card-table-content">
+        <br />
+    </div>
+
+    <div class="card-table-footer">
+        <div class="card-table-footer-left"><br /></div>
+        <div class="card-table-footer-centre">
+          <button type="button" routerLink="/main-menu">Back</button>
+        </div>
+        <div class="card-table-footer-right"><br /></div>
+    </div>
+</div>

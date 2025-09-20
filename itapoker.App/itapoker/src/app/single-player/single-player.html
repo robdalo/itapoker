@@ -1,5 +1,22 @@
-<h2>Single Player</h2>
-<div class="single-player-container">
-    <input type="text" [(ngModel)]="playerName" placeholder="Player Name" />
-    <button type="button" (click)="startGameClick()">START GAME</button>
+<div class="card-table">
+    <div class="card-table-header">
+        <div class="card-table-header-left"><br /></div>
+        <div class="card-table-header-centre">
+            <h4>Single Player</h4>
+        </div>
+        <div class="card-table-header-right"><br /></div>
+    </div>
+
+    <div class="card-table-content">
+        <input type="text" [(ngModel)]="playerName" placeholder="Player Name" />
+    </div>
+
+    <div class="card-table-footer">
+        <div class="card-table-footer-left"><br /></div>
+        <div class="card-table-footer-centre">
+            <button type="button" routerLink="/main-menu">Back</button>
+            <button type="button" (click)="startGameClick()">Start</button>
+        </div>
+        <div class="card-table-footer-right"><br /></div>
+    </div>
 </div>
