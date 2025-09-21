@@ -11,5 +11,5 @@ public class Player
     public int Cash { get; set; }
     public BetType LastBetType { get; set; }
     public int LastBetAmount { get; set; }
-    public List<Card> Cards { get; set; } = new();    
+    public List<Card> Cards { get; set; } = new();
 }

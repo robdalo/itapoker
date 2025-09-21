@@ -26,23 +26,18 @@ export class SinglePlayer {
       PlayerName: this.playerName
     };
 
-    this.http.post("http://localhost:5174/game/singleplayer", request).subscribe(
-      (response) => this.startGameSuccess(response),
-      (error) => this.startGameError(error)
-    );
+    this.http.post("http://localhost:5174/game/singleplayer", request).subscribe({
+      next: value => this.startGameSuccess(value),
+      error: err => this.startGameError(err),
+      complete: () => {}
+    });
   }
 
   startGameSuccess(response: any) {
-
-    localStorage.setItem("playerName", this.playerName);
-    localStorage.setItem("cash", this.cash);
-    localStorage.setItem("ante", this.ante);
-    localStorage.setItem("limit", this.limit);
-
+    localStorage.setItem("game", JSON.stringify(response));
     this.router.navigate(['/card-table']);
   }
 
   startGameError(error: any) {
-
   }
 }
