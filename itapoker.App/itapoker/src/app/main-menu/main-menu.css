@@ -1,3 +1,6 @@
 .card-table-content { padding-top: 24px; }
 .card-table-content button { width: 400px; margin-bottom: 16px; padding: 16px 0 16px 0; background: limegreen; border-bottom: 8px solid black; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; cursor: pointer; }
-.card-table-content button:hover { border-bottom: 8px solid white; }
+.card-table-content button:hover { border-bottom: 8px solid yellowgreen; }
+.card-table-content img { width: 150px; height: auto; margin-top: 12px; }
+.card-table-footer { text-align: center; }
+.card-table-footer img { width: 70px; height: auto; margin: 0 4px 0 4px; }

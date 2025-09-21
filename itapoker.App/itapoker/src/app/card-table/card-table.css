@@ -1,8 +1,12 @@
-.card-table-chips { padding-top: 9px; text-align: center; }
-.card-table-chips img { width: 50px; height: auto; margin-right: 6px; cursor: pointer; }
+.card-table-chips { padding-top: 4px; text-align: center; }
+.card-table-chips div { width: 60px; height: 60px; float: left; margin-right: 6px; text-align: center; }
+.card-table-chips img { width: 60px; height: auto; cursor: pointer; display: block; }
+.card-table-chips span { margin-top: -40px; margin-left: -1px; color: white; font-weight: bold; display: block; cursor: pointer; }
 .card-table-player-hand { clear: both; display: table; padding-bottom: 32px; text-align: center; }
-.card-table-player-hand div { width: 125px; float: left; }
-.card-table-player-hand div.end { width: 80px; }
-.card-table-player-hand div.end img { width: 50px; height: auto; margin-bottom: -16px; }
-.card-table-player-hand img { width: 110px; height: auto; margin-bottom: 16px; cursor: pointer; }
-.card-table-player-hand span { padding: 8px; background: yellow; color: black; font-weight: bold; }
+.card-table-player-hand div.card { width: 125px; float: left; }
+.card-table-player-hand div.card img { width: 110px; height: auto; margin-bottom: 16px; cursor: pointer; }
+.card-table-player-hand div.card span { padding: 8px; background: yellow; color: black; font-weight: bold; }
+.card-table-player-hand div.end { width: 83px; float: left; text-align: center; }
+.card-table-player-hand div.end div { width: 60px; height: 60px; margin: auto; text-align: center; }
+.card-table-player-hand div.end img { width: 60px; height: auto; margin-top: -12px; display: block; cursor: pointer; }
+.card-table-player-hand div.end span { margin-top: -40px; color: white; font-weight: bold; display: block; cursor: pointer; }

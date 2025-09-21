@@ -1,6 +1,6 @@
 button { margin-right: 8px; }
-input { margin-bottom: 24px; padding: 16px 0 16px 0; background: limegreen; border-bottom: 8px solid black; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; }
-
+input { margin-bottom: 24px; padding: 16px 0 16px 0; background: limegreen; border-bottom: 8px solid yellowgreen; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; }
+input::placeholder { color: lightgray; }
 .card-table-footer-left { width: 10%; }
 .card-table-footer-centre { width: 80%; }
 .card-table-footer-right { width: 10%; }
