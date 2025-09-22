@@ -278,21 +278,21 @@ public class GameEngine : IGameEngine
             GameId = Guid.NewGuid().ToString(),
             Hand = 1,
             Stage = GameStage.Ante,
-            Ante = request.Ante,
-            Cash = request.Cash,
-            Limit = request.Limit,
+            Ante = Math.Max(request.Ante, 5),
+            Cash = Math.Max(request.Cash, 500),
+            Limit = Math.Max(request.Limit, 100),
             Players = new() {
                 new() {
                     Name = request.PlayerName,
                     PlayerId = Guid.NewGuid().ToString(),
                     PlayerType = PlayerType.Human,
-                    Cash = request.Cash,
+                    Cash = Math.Max(request.Cash, 500)
                 },
                 new() {
                     Name = "AI Player",
                     PlayerId = Guid.NewGuid().ToString(),
                     PlayerType = PlayerType.Computer,
-                    Cash = request.Cash
+                    Cash = Math.Max(request.Cash, 500)
                 }
             }
         };

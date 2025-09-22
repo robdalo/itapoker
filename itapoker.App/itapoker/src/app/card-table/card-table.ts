@@ -16,7 +16,8 @@ export class CardTable {
   hand = String();
   stage = String();
   pot = String();
-  cashPlayer = String();
+  playerCash = String();
+  playerWinnings = String();
 
   chipsAIPlayer: number[] = [ 0, 0, 0, 0 ];
   chipsPlayer: number[] = [ 0, 0, 0, 0 ];
@@ -41,7 +42,8 @@ export class CardTable {
     this.hand = game.hand;
     this.stage = this.getGameStage(game.stage);
     this.pot = game.pot;
-    this.cashPlayer = game.player.cash;
+    this.playerCash = game.player.cash;
+    this.playerWinnings = game.player.winnings;
   }
 
   addChipClick(number: number) {
@@ -49,8 +51,157 @@ export class CardTable {
   }
 
   btnAnteClick() {
+    
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId
+    };
+
+    this.http.post("http://localhost:5174/game/anteup", request).subscribe({
+      next: value => this.anteUpSuccess(value),
+      error: err => this.anteUpError(err),
+      complete: () => {}
+    });
+  }
+
+  btnDrawClick() {
 
   }
+
+  btnCallClick() {
+
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId,
+      BetType: 1 // call
+    };
+
+    this.http.post("http://localhost:5174/game/bet", request).subscribe({
+      next: value => this.callSuccess(value),
+      error: err => this.callError(err),
+      complete: () => {}
+    });
+  }  
+
+  btnCheckClick() {
+
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId,
+      BetType: 2 // check
+    };
+
+    this.http.post("http://localhost:5174/game/bet", request).subscribe({
+      next: value => this.checkSuccess(value),
+      error: err => this.checkError(err),
+      complete: () => {}
+    });
+  }
+
+  btnFoldClick() {
+
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId,
+      BetType: 3 // fold
+    };
+
+    this.http.post("http://localhost:5174/game/bet", request).subscribe({
+      next: value => this.foldSuccess(value),
+      error: err => this.foldError(err),
+      complete: () => {}
+    });
+  }
+
+  btnRaiseClick() {
+
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId,
+      BetType: 4, // raise
+      Amount: this.getPlayerBet()
+    };
+
+    this.http.post("http://localhost:5174/game/bet", request).subscribe({
+      next: value => this.raiseSuccess(value),
+      error: err => this.raiseError(err),
+      complete: () => {}
+    });
+  }
+
+  btnDealClick() {
+    
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId
+    };
+
+    this.http.post("http://localhost:5174/game/deal", request).subscribe({
+      next: value => this.dealSuccess(value),
+      error: err => this.dealError(err),
+      complete: () => {}
+    });     
+  }
+
+  anteUpSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  anteUpError(error: any) {
+
+  }
+
+  callSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  callError(error: any) {
+
+  }
+
+  checkSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  checkError(error: any) {
+
+  }
+
+  foldSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();    
+  }
+
+  foldError(error: any) {
+
+  }
+
+  dealSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  dealError(error: any) {
+
+  }
+
+  raiseSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  raiseError(error: any) {
+
+  }  
 
   cardClick(number: number) {
     this.holdPlayer[number] = !this.holdPlayer[number];
@@ -59,6 +210,10 @@ export class CardTable {
   getGame() {
     var json = localStorage.getItem("game");
     return json ? JSON.parse(json) : null;
+  }
+
+  saveGame(game: any) {
+    localStorage.setItem("game", JSON.stringify(game));
   }
 
   getGameStage(number: number) {
@@ -101,6 +256,21 @@ export class CardTable {
   isDeal() {
     var game = this.getGame();
     return game.stage == 3; // deal
+  }
+
+  isBet() {
+    var game = this.getGame();
+    return game.stage == 4; // bet pre draw
+  }
+
+  isDraw() {
+    var game = this.getGame();
+    return game.stage == 5; // draw
+  }  
+
+  isPostDeal() {
+    var game = this.getGame();
+    return game.stage > 3; // deal
   }
 
   removeChipClick(number: number) {

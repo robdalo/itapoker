@@ -10,12 +10,12 @@
             <h5>Three of a Kind</h5>
         </div>
         <div class="card-table-header-right">
-            <h5>${{ getPot() }}</h5>      
+            <h5>${{ pot }}</h5>
         </div>
     </div>
 
     <div class="card-table-content">
-        <div class="card-table-player-hand">
+        <div class="card-table-player-hand" *ngIf="isPostDeal()">
             <div class="end">
                 <div *ngIf="chipsAIPlayer[0] > 0">
                     <img src="images/chips/light-blue.png" alt="Light Blue Chip" />
@@ -57,26 +57,26 @@
             </div>
         </div>
 
-        <div class="card-table-player-hand">
+        <div class="card-table-player-hand" *ngIf="isPostDeal()">
             <div class="end"><br /></div>
             <div class="card">
-                <img src="images/cards/ten-clubs.png" alt="Card Back" (click)="cardClick(0)" />
+                <img src="{{ getGame().player.cards[0].url }}" alt="{{ getGame().player.cards[0].title }}" (click)="cardClick(0)" />
                 <span *ngIf="holdPlayer[0]">HOLD</span>
             </div>
             <div class="card">
-                <img src="images/cards/jack-clubs.png" alt="Card Back" (click)="cardClick(1)" />
+                <img src="{{ getGame().player.cards[1].url }}" alt="{{ getGame().player.cards[1].title }}" (click)="cardClick(1)" />
                 <span *ngIf="holdPlayer[1]">HOLD</span>
             </div>
             <div class="card">
-                <img src="images/cards/queen-clubs.png" alt="Card Back" (click)="cardClick(2)" />
+                <img src="{{ getGame().player.cards[2].url }}" alt="{{ getGame().player.cards[2].title }}" (click)="cardClick(2)" />
                 <span *ngIf="holdPlayer[2]">HOLD</span>
             </div>
             <div class="card">
-                <img src="images/cards/king-clubs.png" alt="Card Back" (click)="cardClick(3)" />
+                <img src="{{ getGame().player.cards[3].url }}" alt="{{ getGame().player.cards[3].title }}" (click)="cardClick(3)" />
                 <span *ngIf="holdPlayer[3]">HOLD</span>
             </div>
             <div class="card">
-                <img src="images/cards/ace-clubs.png" alt="Card Back" (click)="cardClick(4)" />
+                <img src="{{ getGame().player.cards[4].url }}" alt="{{ getGame().player.cards[4].title }}" (click)="cardClick(4)" />
                 <span *ngIf="holdPlayer[4]">HOLD</span>
             </div>
             <div class="end">
@@ -103,12 +103,17 @@
     <div class="card-table-footer">
         <div class="card-table-footer-left">
             <h3>Hand: {{ hand }}</h3>
-            <h3>Cash: ${{ cashPlayer }}</h3>
-            <h3>Won: $140</h3>          
+            <h3>Cash: ${{ playerCash }}</h3>
+            <h3>Win: ${{ playerWinnings }}</h3>          
         </div>
         <div class="card-table-footer-centre">
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
-            <button type="button" *ngIf="isDeal()">Deal</button>
+            <button type="button" *ngIf="isDeal()" (click)="btnDealClick()">Deal</button>
+            <button type="button" *ngIf="isBet()" (click)="btnFoldClick()">Fold</button>
+            <button type="button" *ngIf="isBet()" (click)="btnCheckClick()">Check</button>
+            <button type="button" *ngIf="isBet()" (click)="btnRaiseClick()">Raise</button>
+            <button type="button" *ngIf="isBet()" (click)="btnCallClick()">Call</button>
+            <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>            
         </div>
         <div class="card-table-footer-right">
             <div class="card-table-chips">
