@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-card-table',
@@ -15,11 +16,16 @@ export class CardTable {
   hand = String();
   stage = String();
   pot = String();
+  cashPlayer = String();
 
   chipsAIPlayer: number[] = [ 0, 0, 0, 0 ];
   chipsPlayer: number[] = [ 0, 0, 0, 0 ];
   holdAIPlayer: Boolean[] = [ false, false, false, false, false ];
   holdPlayer: Boolean[] = [ false, false, false, false, false ];
+
+  constructor(
+    private http: HttpClient) {
+  }
 
   ngOnInit() {
     this.updateCardTable();
@@ -35,11 +41,16 @@ export class CardTable {
     this.hand = game.hand;
     this.stage = this.getGameStage(game.stage);
     this.pot = game.pot;
+    this.cashPlayer = game.player.cash;
   }
 
   addChipClick(number: number) {
     this.chipsPlayer[number]++;
-  }  
+  }
+
+  btnAnteClick() {
+
+  }
 
   cardClick(number: number) {
     this.holdPlayer[number] = !this.holdPlayer[number];
@@ -69,6 +80,17 @@ export class CardTable {
       return "GameOver";
 
     return "";
+  }
+
+  getPlayerBet() {
+    return (this.chipsPlayer[0] * 5) +
+           (this.chipsPlayer[1] * 10) +
+           (this.chipsPlayer[2] * 25) +
+           (this.chipsPlayer[3] * 50);
+  }
+
+  getPot() {
+    return this.getPlayerBet();
   }
 
   isAnte() {
