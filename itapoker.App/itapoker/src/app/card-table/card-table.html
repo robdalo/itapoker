@@ -36,19 +36,19 @@
                 <br />
             </div>
             <div class="card">
-                <img src="images/cards/back.png" alt="Card Back" />
+                <img src="{{ getGame().aiPlayer.cards[0].url }}" alt="{{ getGame().aiPlayer.cards[0].title }}" />
             </div>
             <div class="card">
-                <img src="images/cards/back.png" alt="Card Back" />
+                <img src="{{ getGame().aiPlayer.cards[1].url }}" alt="{{ getGame().aiPlayer.cards[1].title }}" />
             </div>
             <div class="card">
-                <img src="images/cards/back.png" alt="Card Back" />
+                <img src="{{ getGame().aiPlayer.cards[2].url }}" alt="{{ getGame().aiPlayer.cards[2].title }}" />
             </div>
             <div class="card">
-                <img src="images/cards/back.png" alt="Card Back" />
+                <img src="{{ getGame().aiPlayer.cards[3].url }}" alt="{{ getGame().aiPlayer.cards[3].title }}" />
             </div>
             <div class="card">
-                <img src="images/cards/back.png" alt="Card Back" />
+                <img src="{{ getGame().aiPlayer.cards[4].url }}" alt="{{ getGame().aiPlayer.cards[4].title }}" />
             </div>
             <div class="end">
                 <div *ngIf="getPlayerBet() > 0">
@@ -61,23 +61,23 @@
             <div class="end"><br /></div>
             <div class="card">
                 <img src="{{ getGame().player.cards[0].url }}" alt="{{ getGame().player.cards[0].title }}" (click)="cardClick(0)" />
-                <span *ngIf="holdPlayer[0]">HOLD</span>
+                <span *ngIf="getGame().player.cards[0].hold">HOLD</span>
             </div>
             <div class="card">
                 <img src="{{ getGame().player.cards[1].url }}" alt="{{ getGame().player.cards[1].title }}" (click)="cardClick(1)" />
-                <span *ngIf="holdPlayer[1]">HOLD</span>
+                <span *ngIf="getGame().player.cards[1].hold">HOLD</span>
             </div>
             <div class="card">
                 <img src="{{ getGame().player.cards[2].url }}" alt="{{ getGame().player.cards[2].title }}" (click)="cardClick(2)" />
-                <span *ngIf="holdPlayer[2]">HOLD</span>
+                <span *ngIf="getGame().player.cards[2].hold">HOLD</span>
             </div>
             <div class="card">
                 <img src="{{ getGame().player.cards[3].url }}" alt="{{ getGame().player.cards[3].title }}" (click)="cardClick(3)" />
-                <span *ngIf="holdPlayer[3]">HOLD</span>
+                <span *ngIf="getGame().player.cards[3].hold">HOLD</span>
             </div>
             <div class="card">
                 <img src="{{ getGame().player.cards[4].url }}" alt="{{ getGame().player.cards[4].title }}" (click)="cardClick(4)" />
-                <span *ngIf="holdPlayer[4]">HOLD</span>
+                <span *ngIf="getGame().player.cards[4].hold">HOLD</span>
             </div>
             <div class="end">
                 <div *ngIf="chipsPlayer[0] > 0" (click)="removeChipClick(0)">
@@ -109,11 +109,13 @@
         <div class="card-table-footer-centre">
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
             <button type="button" *ngIf="isDeal()" (click)="btnDealClick()">Deal</button>
-            <button type="button" *ngIf="isBet()" (click)="btnFoldClick()">Fold</button>
-            <button type="button" *ngIf="isBet()" (click)="btnCheckClick()">Check</button>
-            <button type="button" *ngIf="isBet()" (click)="btnRaiseClick()">Raise</button>
-            <button type="button" *ngIf="isBet()" (click)="btnCallClick()">Call</button>
-            <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>            
+            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnFoldClick()">Fold</button>
+            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnCheckClick()">Check</button>
+            <button type="button" *ngIf="isBet() && getPlayerBet() > 0" (click)="btnRaiseClick()">Raise</button>
+            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnCallClick()">Call</button>
+            <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>
+            <button type="button" *ngIf="isShowdown()" (click)="btnShowdownClick()">Showdown</button>
+            <button type="button" *ngIf="isGameOver()" (click)="btnNextClick()">Next</button>
         </div>
         <div class="card-table-footer-right">
             <div class="card-table-chips">

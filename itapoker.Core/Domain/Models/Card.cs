@@ -6,6 +6,7 @@ public class Card
 {
     public CardSuit Suit { get; set; }
     public CardRank Rank { get; set; }
+    public bool Hold { get; set; }
     public string Title => $"{this.Rank} {this.Suit}";
     public string Url => $"images/cards/{this.Rank}-{this.Suit}.png".ToLower();
 

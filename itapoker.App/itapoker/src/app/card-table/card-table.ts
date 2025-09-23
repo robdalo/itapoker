@@ -21,8 +21,6 @@ export class CardTable {
 
   chipsAIPlayer: number[] = [ 0, 0, 0, 0 ];
   chipsPlayer: number[] = [ 0, 0, 0, 0 ];
-  holdAIPlayer: Boolean[] = [ false, false, false, false, false ];
-  holdPlayer: Boolean[] = [ false, false, false, false, false ];
 
   constructor(
     private http: HttpClient) {
@@ -67,6 +65,19 @@ export class CardTable {
 
   btnDrawClick() {
 
+    var game = this.getGame();
+    var cards = game.player.cards as any[];
+
+    var request = {
+      GameId: game.gameId,
+      Cards: cards.filter(item => !item.hold)
+    };
+
+    this.http.post("http://localhost:5174/game/draw", request).subscribe({
+      next: value => this.drawSuccess(value),
+      error: err => this.drawError(err),
+      complete: () => {}
+    });
   }
 
   btnCallClick() {
@@ -134,6 +145,36 @@ export class CardTable {
     });
   }
 
+  btnNextClick() {
+  
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId
+    };
+
+    this.http.post("http://localhost:5174/game/next", request).subscribe({
+      next: value => this.nextSuccess(value),
+      error: err => this.nextError(err),
+      complete: () => {}
+    });
+  }
+
+  btnShowdownClick() {
+
+    var game = this.getGame();
+
+    var request = {
+      GameId: game.gameId
+    };
+
+    this.http.post("http://localhost:5174/game/showdown", request).subscribe({
+      next: value => this.showdownSuccess(value),
+      error: err => this.showdownError(err),
+      complete: () => {}
+    });
+  }
+
   btnDealClick() {
     
     var game = this.getGame();
@@ -146,7 +187,7 @@ export class CardTable {
       next: value => this.dealSuccess(value),
       error: err => this.dealError(err),
       complete: () => {}
-    });     
+    });
   }
 
   anteUpSuccess(response: any) {
@@ -164,6 +205,15 @@ export class CardTable {
   }
 
   callError(error: any) {
+
+  }
+
+  drawSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  drawError(error: any) {
 
   }
 
@@ -194,6 +244,15 @@ export class CardTable {
 
   }
 
+  nextSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  nextError(error: any) {
+
+  }
+
   raiseSuccess(response: any) {
     this.saveGame(response);
     this.updateCardTable();
@@ -201,10 +260,21 @@ export class CardTable {
 
   raiseError(error: any) {
 
-  }  
+  }
+
+  showdownSuccess(response: any) {
+    this.saveGame(response);
+    this.updateCardTable();
+  }
+
+  showdownError(error: any) {
+
+  }
 
   cardClick(number: number) {
-    this.holdPlayer[number] = !this.holdPlayer[number];
+    var game = this.getGame();
+    game.player.cards[number].hold = !game.player.cards[number].hold;
+    this.saveGame(game);
   }
 
   getGame() {
@@ -260,17 +330,27 @@ export class CardTable {
 
   isBet() {
     var game = this.getGame();
-    return game.stage == 4; // bet pre draw
+    return game.stage == 4 || game.stage == 6; // bet pre draw / bet post draw
   }
 
   isDraw() {
     var game = this.getGame();
     return game.stage == 5; // draw
-  }  
+  }
+
+  isGameOver() {
+    var game = this.getGame();
+    return game.stage == 8; // gameover
+  }
 
   isPostDeal() {
     var game = this.getGame();
     return game.stage > 3; // deal
+  }
+
+  isShowdown() {
+    var game = this.getGame();
+    return game.stage == 7; // showdown
   }
 
   removeChipClick(number: number) {
