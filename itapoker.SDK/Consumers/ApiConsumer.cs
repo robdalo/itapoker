@@ -1,4 +1,3 @@
-using System.Runtime.Versioning;
 using itapoker.SDK.Models;
 using itapoker.SDK.Requests;
 using itapoker.Shared.Config;
@@ -15,6 +14,14 @@ public class ApiConsumer
     public ApiConsumer(string baseUrl)
     {
         _restConsumer = new RestConsumer(baseUrl);
+    }
+
+    public async Task<Game> AddChipAsync(AddChipRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.AddChip,
+            authToken: AuthToken,
+            payload: request);
     }
 
     public async Task<Game> AnteUpAsync(AnteUpRequest request)
@@ -55,11 +62,27 @@ public class ApiConsumer
             endpoint: ApiEndpoints.HighScores,
             authToken: AuthToken);
     }
+
+    public async Task<Game> HoldAsync(HoldRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.Hold,
+            authToken: AuthToken,
+            payload: request);
+    }
     
     public async Task<Game> NextAsync(NextRequest request)
     {
         return await _restConsumer.PostAsync<Game>(
             endpoint: ApiEndpoints.Next,
+            authToken: AuthToken,
+            payload: request);
+    }
+
+    public async Task<Game> RemoveChipAsync(RemoveChipRequest request)
+    {
+        return await _restConsumer.PostAsync<Game>(
+            endpoint: ApiEndpoints.RemoveChip,
             authToken: AuthToken,
             payload: request);
     }

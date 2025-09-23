@@ -7,11 +7,15 @@ public class DomainToSDK : Profile
 {
     public DomainToSDK()
     {
+        CreateMap<Domain.Requests.AddChipRequest, SDK.Requests.AddChipRequest>();
         CreateMap<Domain.Requests.AnteUpRequest, SDK.Requests.AnteUpRequest>();
         CreateMap<Domain.Requests.BetRequest, SDK.Requests.BetRequest>();
         CreateMap<Domain.Requests.DealRequest, SDK.Requests.DealRequest>();
         CreateMap<Domain.Requests.DrawRequest, SDK.Requests.DrawRequest>();
+        CreateMap<Domain.Requests.HoldRequest, SDK.Requests.HoldRequest>();
         CreateMap<Domain.Requests.NextRequest, SDK.Requests.NextRequest>();
+        CreateMap<Domain.Requests.RemoveChipRequest, SDK.Requests.RemoveChipRequest>();
+        CreateMap<Domain.Requests.RemoveHoldRequest, SDK.Requests.RemoveHoldRequest>();
         CreateMap<Domain.Requests.SetDecisionRequest, SDK.Requests.SetDecisionRequest>();
         CreateMap<Domain.Requests.ShowdownRequest, SDK.Requests.ShowdownRequest>();
         CreateMap<Domain.Requests.SinglePlayerRequest, SDK.Requests.SinglePlayerRequest>();
@@ -23,6 +27,7 @@ public class DomainToSDK : Profile
         CreateMap<Domain.Enums.PlayerType, SDK.Enums.PlayerType>();
 
         CreateMap<Domain.Models.Card, SDK.Models.Card>();
+        CreateMap<Domain.Models.Chip, SDK.Models.Chip>();
         CreateMap<Domain.Models.Game, SDK.Models.Game>();
         CreateMap<Domain.Models.HighScore, SDK.Models.HighScore>();
         CreateMap<Domain.Models.Player, SDK.Models.Player>();

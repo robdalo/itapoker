@@ -33,13 +33,22 @@ public class DealerService : IDealerService
     {
         var game = _gameRepo.GetByGameId(gameId);
 
-        for (var i = 0; i < 5; i++)
+        for (var i=0; i<5; i++)
         {
             foreach (var player in game.Players.OrderByDescending(x => x.PlayerType))
             {
                 player.Cards.Add(game.Deck.Last());
                 game.Deck.Remove(game.Deck.Last());
             }
+        }
+
+        // sort cards
+        
+        foreach (var player in game.Players)
+        {
+            player.Cards = player.Cards.OrderBy(x => x.Rank)
+                                       .ThenBy(x => x.Suit)
+                                       .ToList();
         }
 
         game.Stage = GameStage.BetPreDraw;
@@ -64,6 +73,8 @@ public class DealerService : IDealerService
 
         var cards = Deck.Cards;
         var total = Deck.Cards.Count;
+
+        game.Deck.Clear();
 
         for (var i = 0; i < total; i++)
         {

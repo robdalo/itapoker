@@ -28,6 +28,17 @@ public class GameController : ControllerBase
     }
 
     [HttpPost]
+    [Route("chip/add")]
+    public IActionResult AddChip(SDK.Requests.AddChipRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.AddChipRequest>(request);
+
+        var game = _gameEngine.AddChip(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+
+    [HttpPost]
     [Route("anteup")]
     public IActionResult AnteUp(SDK.Requests.AnteUpRequest request)
     {
@@ -71,6 +82,17 @@ public class GameController : ControllerBase
         return Ok(_mapper.Map<Game>(game));
     }
 
+    [HttpPost]
+    [Route("hold")]
+    public IActionResult Hold(SDK.Requests.HoldRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.HoldRequest>(request);
+
+        var game = _gameEngine.Hold(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+
     [HttpGet]
     [Route("highscores")]
     public IActionResult HighScores()
@@ -85,6 +107,17 @@ public class GameController : ControllerBase
         var mapped = _mapper.Map<Domain.Requests.NextRequest>(request);
 
         var game = _gameEngine.Next(mapped);
+
+        return Ok(_mapper.Map<Game>(game));
+    }
+
+    [HttpPost]
+    [Route("chip/remove")]
+    public IActionResult RemoveChip(SDK.Requests.RemoveChipRequest request)
+    {
+        var mapped = _mapper.Map<Domain.Requests.RemoveChipRequest>(request);
+
+        var game = _gameEngine.RemoveChip(mapped);
 
         return Ok(_mapper.Map<Game>(game));
     }

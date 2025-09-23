@@ -1,3 +1,4 @@
+using AutoMapper.Configuration.Annotations;
 using itapoker.Core.Domain.Enums;
 using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Requests;
@@ -27,6 +28,25 @@ public class GameEngine : IGameEngine
         _decisionService = decisionService;
         _gameRepo = gameRepo;
         _highScoreRepo = highScoreRepo;
+    }
+
+    public Game AddChip(AddChipRequest request)
+    {
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        var existing = game.Player.Chips.FirstOrDefault(x => x.Value == request.Value);
+
+        if (existing == null)
+        {
+            existing = new Chip(request.Value);
+            game.Player.Chips.Add(existing);
+        }
+
+        existing.Quantity++;
+
+        game.Player.Chips = game.Player.Chips.OrderBy(x => x.Value).ToList();
+
+        return _gameRepo.AddOrUpdate(game);
     }
 
     public Game AnteUp(AnteUpRequest request)
@@ -164,6 +184,9 @@ public class GameEngine : IGameEngine
             game.Pot += amount;
         }
 
+        game.Player.Chips.Clear();
+        game.AIPlayer.Chips.Clear();
+
         return _gameRepo.AddOrUpdate(game);
     }
 
@@ -172,6 +195,8 @@ public class GameEngine : IGameEngine
         // dealer shuffles the deck and then distributes
         // five cards to each player, one card to each player
         // at a time
+
+        var game = _gameRepo.GetByGameId(request.GameId);
 
         _dealerService.Shuffle(request.GameId);
         _dealerService.Deal(request.GameId);
@@ -218,7 +243,33 @@ public class GameEngine : IGameEngine
             game.Deck.Remove(game.Deck.Last());
         }
 
+        // clear holds
+
+        foreach (var card in game.Players.SelectMany(x => x.Cards))
+            card.Hold = false;      
+
+        // sort cards
+
+        foreach (var player in game.Players)
+        {
+            player.Cards = player.Cards.OrderBy(x => x.Rank)
+                                       .ThenBy(x => x.Suit)
+                                       .ToList();
+        }
+
         game.Stage = GameStage.BetPostDraw;
+
+        return _gameRepo.AddOrUpdate(game);
+    }
+
+    public Game Hold(HoldRequest request)
+    {
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        var card = game.Player.Cards.First(x => x.Rank == request.Rank &&
+                                                x.Suit == request.Suit);
+
+        card.Hold = !card.Hold;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -227,11 +278,32 @@ public class GameEngine : IGameEngine
     {
         var game = _gameRepo.GetByGameId(request.GameId);
 
+        // return player cards to dealer
+        foreach (var player in game.Players)
+            player.Cards.Clear();
+
         if (game.Stage == GameStage.GameOver)
         {
             game.Hand++;
             game.Stage = GameStage.Ante;
         }
+
+        return _gameRepo.AddOrUpdate(game);
+    }
+
+    public Game RemoveChip(RemoveChipRequest request)
+    {
+        var game = _gameRepo.GetByGameId(request.GameId);
+
+        var existing = game.Player.Chips.FirstOrDefault(x => x.Value == request.Value);
+
+        if (existing != null)
+        {
+            if (--existing.Quantity < 1)
+                game.Player.Chips.Remove(existing);
+        }
+
+        game.Player.Chips = game.Player.Chips.OrderBy(x => x.Value).ToList();
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -254,9 +326,17 @@ public class GameEngine : IGameEngine
         var aiHandType = _cardService.GetHandType(game.AIPlayer.Cards);
 
         if (playerHandType > aiHandType)
+        {
             game.Player.Cash += game.Pot;
+            game.Player.Winnings += game.Pot / 2;
+            game.AIPlayer.Winnings -= game.Pot / 2;
+        }
         else if (aiHandType > playerHandType)
+        {
             game.AIPlayer.Cash += game.Pot;
+            game.AIPlayer.Winnings += game.Pot / 2;
+            game.Player.Winnings -= game.Pot / 2;
+        }
         else
         {
             game.Player.Cash += game.Pot / 2;
