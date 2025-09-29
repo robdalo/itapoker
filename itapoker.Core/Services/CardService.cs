@@ -14,11 +14,6 @@ public class CardService : ICardService
     {
         switch (handType)
         {
-            case HandType.TwoHigh: return "Two High";
-            case HandType.ThreeHigh: return "Three High";
-            case HandType.FourHigh: return "Four High";
-            case HandType.FiveHigh: return "Five High";
-            case HandType.SixHigh: return "Six High";
             case HandType.SevenHigh: return "Seven High";
             case HandType.EightHigh: return "Eight High";
             case HandType.NineHigh: return "Nine High";
@@ -77,16 +72,6 @@ public class CardService : ICardService
             return HandType.EightHigh;
         else if (IsSevenHigh(cards))
             return HandType.SevenHigh;
-        else if (IsSixHigh(cards))
-            return HandType.SixHigh;
-        else if (IsFiveHigh(cards))
-            return HandType.FiveHigh;
-        else if (IsFourHigh(cards))
-            return HandType.FourHigh;
-        else if (IsThreeHigh(cards))
-            return HandType.ThreeHigh;
-        else if (IsTwoHigh(cards))
-            return HandType.TwoHigh;
 
         return HandType.None;
     }

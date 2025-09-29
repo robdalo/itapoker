@@ -46,8 +46,9 @@ export class CardTable {
   }
 
   apiCallSuccess(response: any, renderAlert: boolean) {
+    
     this.saveGame(response);
-
+    
     if (renderAlert)
       this.renderAlert(this.getGame().alert);
   }

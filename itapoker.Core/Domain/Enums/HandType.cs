@@ -3,11 +3,6 @@ namespace itapoker.Core.Domain.Enums;
 public enum HandType
 {
     None = 0,
-    TwoHigh = 2,
-    ThreeHigh = 3,
-    FourHigh = 4,
-    FiveHigh = 5,
-    SixHigh = 6,
     SevenHigh = 7,
     EightHigh = 8,
     NineHigh = 9,
