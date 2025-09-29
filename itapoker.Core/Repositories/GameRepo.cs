@@ -24,6 +24,8 @@ public class GameRepo : IGameRepo
         existing.Cash = game.Cash;
         existing.Limit = game.Limit;
         existing.Pot = game.Pot;
+        existing.Title = game.Title;
+        existing.SubTitle = game.SubTitle;
         existing.Hand = game.Hand;        
         existing.Stage = game.Stage;
         existing.Players = game.Players;

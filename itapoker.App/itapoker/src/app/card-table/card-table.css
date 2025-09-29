@@ -12,3 +12,4 @@
 .card-table-player-hand div.end img { width: 60px; height: auto; margin-top: -16px; display: block; cursor: pointer; }
 .card-table-player-hand div.end span { margin-top: -40px; color: white; font-weight: bold; display: block; cursor: pointer; }
 .card-table-player-hand div.end h5 { color: white; font-size: 150%; font-weight: bold; }
+.error-message { color: darkred; }

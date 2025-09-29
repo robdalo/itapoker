@@ -1,4 +1,3 @@
-using AutoMapper.Configuration.Annotations;
 using itapoker.Core.Domain.Enums;
 using itapoker.Core.Domain.Models;
 using itapoker.Core.Domain.Requests;
@@ -11,23 +10,17 @@ namespace itapoker.Core;
 public class GameEngine : IGameEngine
 {
     private readonly ICardService _cardService;
-    private readonly IDealerService _dealerService;
     private readonly IDecisionService _decisionService;
     private readonly IGameRepo _gameRepo;
-    private readonly IHighScoreRepo _highScoreRepo;
 
     public GameEngine(
         ICardService cardService,
-        IDealerService dealerService,
         IDecisionService decisionService,
-        IGameRepo gameRepo,
-        IHighScoreRepo highScoreRepo)
+        IGameRepo gameRepo)
     {
         _cardService = cardService;
-        _dealerService = dealerService;
         _decisionService = decisionService;
         _gameRepo = gameRepo;
-        _highScoreRepo = highScoreRepo;
     }
 
     public Game AddChip(AddChipRequest request)
@@ -55,16 +48,27 @@ public class GameEngine : IGameEngine
         // player in the game based on the ante specified
         // when creating the game
 
-        _dealerService.AnteUp(request.GameId);
+        var game = _gameRepo.GetByGameId(request.GameId);
 
-        return _gameRepo.GetByGameId(request.GameId);
+        foreach (var player in game.Players)
+        {
+            player.Cash -= game.Ante;
+            game.Pot += game.Ante;
+        }
+
+        game.Stage = GameStage.Deal;
+
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
+
+        return _gameRepo.AddOrUpdate(game);
     }
 
     public Game Bet(BetRequest request)
     {
         // this betting logic is used for both 1st round
         // and 2nd round betting
-        
+
         var game = _gameRepo.GetByGameId(request.GameId);
 
         // process the player bet first, then the ai player bet
@@ -187,6 +191,9 @@ public class GameEngine : IGameEngine
         game.Player.Chips.Clear();
         game.AIPlayer.Chips.Clear();
 
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
+
         return _gameRepo.AddOrUpdate(game);
     }
 
@@ -198,10 +205,50 @@ public class GameEngine : IGameEngine
 
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        _dealerService.Shuffle(request.GameId);
-        _dealerService.Deal(request.GameId);
+        // shuffle
 
-        return _gameRepo.GetByGameId(request.GameId);
+        var random = new Random();
+
+        var cards = Deck.Cards;
+        var total = Deck.Cards.Count;
+
+        game.Deck.Clear();
+
+        for (var i = 0; i < total; i++)
+        {
+            var index = random.Next(0, cards.Count - 1);
+            game.Deck.Add(cards[index]);
+            cards.RemoveAt(index);
+        }
+
+        // deal
+
+        for (var i=0; i<5; i++)
+        {
+            foreach (var player in game.Players.OrderByDescending(x => x.PlayerType))
+            {
+                player.Cards.Add(game.Deck.Last());
+                game.Deck.Remove(game.Deck.Last());
+            }
+        }
+
+        // sort cards
+
+        foreach (var player in game.Players)
+        {
+            player.Cards = player.Cards.OrderBy(x => x.Rank)
+                                       .ThenBy(x => x.Suit)
+                                       .ToList();
+                                       
+            player.HandType = _cardService.GetHandType(player.Cards);
+        }
+
+        game.Stage = GameStage.BetPreDraw;
+        
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
+
+        return _gameRepo.AddOrUpdate(game);
     }
 
     public Game Draw(DrawRequest request)
@@ -246,7 +293,7 @@ public class GameEngine : IGameEngine
         // clear holds
 
         foreach (var card in game.Players.SelectMany(x => x.Cards))
-            card.Hold = false;      
+            card.Hold = false;
 
         // sort cards
 
@@ -255,9 +302,13 @@ public class GameEngine : IGameEngine
             player.Cards = player.Cards.OrderBy(x => x.Rank)
                                        .ThenBy(x => x.Suit)
                                        .ToList();
+
+            player.HandType = _cardService.GetHandType(player.Cards);
         }
 
         game.Stage = GameStage.BetPostDraw;
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -278,15 +329,16 @@ public class GameEngine : IGameEngine
     {
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        // return player cards to dealer
+        // return player cards to deck
+
         foreach (var player in game.Players)
             player.Cards.Clear();
 
-        if (game.Stage == GameStage.GameOver)
-        {
-            game.Hand++;
-            game.Stage = GameStage.Ante;
-        }
+        game.Hand++;
+        game.Stage = GameStage.Ante;
+
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -345,6 +397,8 @@ public class GameEngine : IGameEngine
 
         game.Pot = 0;
         game.Stage = GameStage.GameOver;
+        game.Title = GetTitle(game.Stage);
+        game.SubTitle = GetSubTitle(game.Stage);
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -361,6 +415,8 @@ public class GameEngine : IGameEngine
             Ante = Math.Max(request.Ante, 5),
             Cash = Math.Max(request.Cash, 500),
             Limit = Math.Max(request.Limit, 100),
+            Title = GetTitle(GameStage.Ante),
+            SubTitle = GetSubTitle(GameStage.Ante),
             Players = new() {
                 new() {
                     Name = request.PlayerName,
@@ -405,5 +461,37 @@ public class GameEngine : IGameEngine
         return stage == GameStage.BetPreDraw ?
             GameStage.Draw :
             GameStage.Showdown;
+    }
+
+    private string GetSubTitle(GameStage stage)
+    {
+        switch (stage)
+        {
+            case GameStage.Ante: return "Pay the ante to play";
+            case GameStage.BetPostDraw: return "Place bets before showdown";
+            case GameStage.BetPreDraw: return "Place bets before draw";
+            case GameStage.Deal: return "Shuffle and deal cards";
+            case GameStage.Draw: return "Hold cards before draw";
+            case GameStage.GameOver: return "Play the next hand";
+            case GameStage.Showdown: return "Highest ranking hand wins pot";
+
+            default: return "";
+        }
+    }
+
+    private string GetTitle(GameStage stage)
+    {
+        switch (stage)
+        {
+            case GameStage.Ante: return "Ante Up";
+            case GameStage.BetPostDraw: return "Bet";
+            case GameStage.BetPreDraw: return "Bet";
+            case GameStage.Deal: return "Deal";
+            case GameStage.Draw: return "Draw";
+            case GameStage.GameOver: return "Game Over";
+            case GameStage.Showdown: return "Showdown";
+
+            default: return "";
+        }
     }
 }

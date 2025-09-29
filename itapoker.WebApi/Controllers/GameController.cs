@@ -1,6 +1,7 @@
 using AutoMapper;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
+using itapoker.Core.Services.Interfaces;
 using itapoker.SDK.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,81 +17,153 @@ public class GameController : ControllerBase
     private readonly IGameEngine _gameEngine;
     private readonly IHighScoreRepo _highScoreRepo;
     private readonly IMapper _mapper;
+    private readonly ISecurityService _securityService;
+    private readonly IValidationService _validationService;
 
     public GameController(
         IGameEngine gameEngine,
         IHighScoreRepo highScoreRepo,
-        IMapper mapper)
+        IMapper mapper,
+        ISecurityService securityService,
+        IValidationService validationService)
     {
         _gameEngine = gameEngine;
         _highScoreRepo = highScoreRepo;
         _mapper = mapper;
+        _securityService = securityService;
+        _validationService = validationService;
     }
 
     [HttpPost]
     [Route("chip/add")]
     public IActionResult AddChip(SDK.Requests.AddChipRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.AddChipRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.AddChipRequest>(request);
 
-        var game = _gameEngine.AddChip(mapped);
+            _validationService.AddChip(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.AddChip(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("anteup")]
     public IActionResult AnteUp(SDK.Requests.AnteUpRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.AnteUpRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.AnteUpRequest>(request);
 
-        var game = _gameEngine.AnteUp(mapped);
+            _validationService.AnteUp(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.AnteUp(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("bet")]
     public IActionResult Bet(SDK.Requests.BetRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.BetRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.BetRequest>(request);
 
-        var game = _gameEngine.Bet(mapped);
+            _validationService.Bet(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Bet(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("deal")]
     public IActionResult Deal(SDK.Requests.DealRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.DealRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.DealRequest>(request);
 
-        var game = _gameEngine.Deal(mapped);
+            _validationService.Deal(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Deal(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("draw")]
     public IActionResult Draw(SDK.Requests.DrawRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.DrawRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.DrawRequest>(request);
 
-        var game = _gameEngine.Draw(mapped);
+            _validationService.Draw(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Draw(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("hold")]
     public IActionResult Hold(SDK.Requests.HoldRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.HoldRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.HoldRequest>(request);
 
-        var game = _gameEngine.Hold(mapped);
+            _validationService.Hold(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Hold(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpGet]
@@ -104,22 +177,44 @@ public class GameController : ControllerBase
     [Route("next")]
     public IActionResult Next(SDK.Requests.NextRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.NextRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.NextRequest>(request);
 
-        var game = _gameEngine.Next(mapped);
+            _validationService.Next(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Next(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
     [Route("chip/remove")]
     public IActionResult RemoveChip(SDK.Requests.RemoveChipRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.RemoveChipRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.RemoveChipRequest>(request);
 
-        var game = _gameEngine.RemoveChip(mapped);
+            _validationService.RemoveChip(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.RemoveChip(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 
     [HttpPost]
@@ -137,21 +232,43 @@ public class GameController : ControllerBase
     [Route("showdown")]
     public IActionResult Showdown(SDK.Requests.ShowdownRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.ShowdownRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.ShowdownRequest>(request);
 
-        var game = _gameEngine.Showdown(mapped);
+            _validationService.Showdown(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.Showdown(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
-    
+
     [HttpPost]
     [Route("singleplayer")]
     public IActionResult SinglePlayer(SDK.Requests.SinglePlayerRequest request)
     {
-        var mapped = _mapper.Map<Domain.Requests.SinglePlayerRequest>(request);
+        try
+        {
+            var mapped = _mapper.Map<Domain.Requests.SinglePlayerRequest>(request);
 
-        var game = _gameEngine.SinglePlayer(mapped);
+            _validationService.SinglePlayer(mapped);
 
-        return Ok(_mapper.Map<Game>(game));
+            var game = _gameEngine.SinglePlayer(mapped);
+
+            _securityService.Redact(game);
+
+            return Ok(_mapper.Map<Game>(game));
+        }
+        catch (Exception e)
+        {
+            return BadRequest(e.Message);
+        }
     }
 }

@@ -6,8 +6,10 @@
             <h3>Cash: ${{ getGame().cash }}</h3>
         </div>
         <div class="card-table-header-centre">
-            <h4>AI Player Turn</h4>
-            <h5>Three of a Kind</h5>
+            <h4>{{ getGame().title }}</h4>
+            <h5 *ngIf="!handTitleTimerRunning && !errorMessageTimerRunning">{{ getGame().subTitle }}</h5>
+            <h5 *ngIf="handTitleTimerRunning && handTitleVisible">{{ getHandTitle(getGame().player.handType) }}</h5>
+            <h5 *ngIf="errorMessageTimerRunning && errorMessageVisible" class="error-message">{{ errorMessage }}</h5>
         </div>
         <div class="card-table-header-right">
             <h5>${{ getGame().pot }}</h5>
@@ -80,10 +82,10 @@
         <div class="card-table-footer-centre">
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
             <button type="button" *ngIf="isDeal()" (click)="btnDealClick()">Deal</button>
-            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnFoldClick()">Fold</button>
+            <!--<button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnFoldClick()">Fold</button>-->
             <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnCheckClick()">Check</button>
             <button type="button" *ngIf="isBet() && getPlayerBet() > 0" (click)="btnRaiseClick()">Raise</button>
-            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnCallClick()">Call</button>
+            <button type="button" *ngIf="isBet() && isCallAvailable()" (click)="btnCallClick()">Call</button>
             <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>
             <button type="button" *ngIf="isShowdown()" (click)="btnShowdownClick()">Showdown</button>
             <button type="button" *ngIf="isGameOver()" (click)="btnNextClick()">Next</button>

@@ -22,7 +22,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<ICardService, CardService>();
         services.AddSingleton<IDecisionService, DecisionService>();
-        services.AddSingleton<IDealerService, DealerService>();
+        services.AddSingleton<ISecurityService, SecurityService>();
         services.AddSingleton<IValidationService, ValidationService>();
 
         services.AddSingleton<IGameEngine, GameEngine>();

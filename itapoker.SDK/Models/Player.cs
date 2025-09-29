@@ -10,6 +10,7 @@ public class Player
     public PlayerType PlayerType { get; set; }
     public int Cash { get; set; }
     public int Winnings { get; set; }
+    public HandType HandType { get; set; }
     public BetType LastBetType { get; set; }
     public int LastBetAmount { get; set; }
     public List<Card> Cards { get; set; } = new();

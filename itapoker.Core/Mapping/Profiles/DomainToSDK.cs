@@ -24,6 +24,7 @@ public class DomainToSDK : Profile
         CreateMap<Domain.Enums.CardRank, SDK.Enums.CardRank>();
         CreateMap<Domain.Enums.CardSuit, SDK.Enums.CardSuit>();
         CreateMap<Domain.Enums.GameStage, SDK.Enums.GameStage>();
+        CreateMap<Domain.Enums.HandType, SDK.Enums.HandType>();
         CreateMap<Domain.Enums.PlayerType, SDK.Enums.PlayerType>();
 
         CreateMap<Domain.Models.Card, SDK.Models.Card>();

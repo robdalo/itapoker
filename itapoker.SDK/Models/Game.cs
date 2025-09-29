@@ -12,6 +12,8 @@ public class Game
     public int Cash { get; set; }
     public int Limit { get; set; }
     public int Pot { get; set; }
+    public string Title { get; set; }
+    public string SubTitle { get; set; }
     public List<Player> Players { get; set; } = new();
     public Player Player { get; set; }
     public Player AIPlayer { get; set; }

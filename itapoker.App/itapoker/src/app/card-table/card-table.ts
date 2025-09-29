@@ -10,16 +10,29 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CardTable {
 
+  errorMessage = "";
+  errorMessageTimerRunning = false;
+  errorMessageVisible = false;
+  handTitleTimerRunning = false;
+  handTitleVisible = false;
+
   constructor(
     private http: HttpClient) {
-  }
-
-  ngOnInit() {
   }
 
   addChipClick(value: number) {
 
     var game = this.getGame();
+
+    // chips can only be added during pre draw and post draw betting
+
+    if (game.stage != 4 && game.stage != 6)
+      return;
+
+    // chips can only be added up to the game limit
+
+    if (this.getPlayerBet() + value > this.getGame().limit)
+      return;
 
     var request = {
       GameId: game.gameId,
@@ -38,6 +51,7 @@ export class CardTable {
   }
 
   apiCallError(error: any) {
+    this.renderErrorMessage(error);
   }
 
   btnAnteClick() {
@@ -96,7 +110,10 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/deal", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => { 
+        this.apiCallSuccess(value);
+        this.renderFlashingHandTitle();
+      },
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -113,7 +130,10 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/draw", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => {
+        this.apiCallSuccess(value);
+        this.renderFlashingHandTitle();
+      },
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -186,6 +206,11 @@ export class CardTable {
 
     var game = this.getGame();
 
+    // cards can only be held during draw
+    
+    if (game.stage != 5)
+      return;
+
     var request = {
       GameId: game.gameId,
       Rank: rank,
@@ -221,6 +246,37 @@ export class CardTable {
     }
   }
 
+  getHandTitle(handType: number) {
+
+    switch (handType)
+    {
+      case 2: return "Two High";
+      case 3: return "Three High";
+      case 4: return "Four High";
+      case 5: return "Five High";
+      case 6: return "Six High";
+      case 7: return "Seven High";
+      case 8: return "Eight High";
+      case 9: return "Nine High";
+      case 10: return "Ten High";
+      case 11: return "Jack High";
+      case 12: return "Queen High";
+      case 13: return "King High";
+      case 14: return "Ace High";
+      case 20: return "One Pair";
+      case 30: return "Two Pair";
+      case 40: return "Three Of A Kind";
+      case 50: return "Straight";
+      case 60: return "Flush";
+      case 70: return "Full House";
+      case 80: return "Four Of A Kind";
+      case 90: return "Straight Flush";
+      case 100: return "Royal Flush";
+
+      default: return "";
+    }
+  }
+
   getPlayerBet() {
 
     var bet = 0;
@@ -241,6 +297,12 @@ export class CardTable {
   isBet() {
     var game = this.getGame();
     return game.stage == 4 || game.stage == 6; // bet pre draw / bet post draw
+  }
+
+  isCallAvailable() {
+
+    var game = this.getGame();
+    return game.aiPlayer.lastBetType == 4; // raise
   }
 
   isCardsDealt() {
@@ -272,6 +334,11 @@ export class CardTable {
 
     var game = this.getGame();
 
+    // chips can only be removed during pre draw and post draw betting
+    
+    if (game.stage != 4 && game.stage != 6)
+      return;
+
     var request = {
       GameId: game.gameId,
       Value: value
@@ -282,6 +349,37 @@ export class CardTable {
       error: err => this.apiCallError(err),
       complete: () => {}
     });
+  }
+
+  renderErrorMessage(error: any) {
+
+    this.errorMessage = error.error;
+    this.errorMessageTimerRunning = true;
+
+    var interval = setInterval(() => {
+      this.errorMessageVisible = !this.errorMessageVisible;
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      this.errorMessageTimerRunning = false;
+      this.errorMessageVisible = false;
+    }, 10000);
+  }
+
+  renderFlashingHandTitle() {
+
+    this.handTitleTimerRunning = true;
+
+    var interval = setInterval(() => {
+      this.handTitleVisible = !this.handTitleVisible;
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(interval);
+      this.handTitleTimerRunning = false;
+      this.handTitleVisible = false;
+    }, 10000);
   }
 
   saveGame(game: any) {
