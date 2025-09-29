@@ -5,5 +5,6 @@ namespace itapoker.Core.Services.Interfaces;
 
 public interface ICardService
 {
+    string GetHandTitle(HandType handType);
     HandType GetHandType(List<Card> cards);
 }

@@ -39,6 +39,8 @@ public class GameEngine : IGameEngine
 
         game.Player.Chips = game.Player.Chips.OrderBy(x => x.Value).ToList();
 
+        game.Alert = null;
+
         return _gameRepo.AddOrUpdate(game);
     }
 
@@ -60,6 +62,7 @@ public class GameEngine : IGameEngine
 
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
+        game.Alert = null;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -193,6 +196,7 @@ public class GameEngine : IGameEngine
 
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
+        game.Alert = null;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -247,6 +251,7 @@ public class GameEngine : IGameEngine
         
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
+        game.Alert = $"You have {_cardService.GetHandTitle(game.Player.HandType)}";
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -309,6 +314,7 @@ public class GameEngine : IGameEngine
         game.Stage = GameStage.BetPostDraw;
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
+        game.Alert = $"You have {_cardService.GetHandTitle(game.Player.HandType)}";
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -321,6 +327,8 @@ public class GameEngine : IGameEngine
                                                 x.Suit == request.Suit);
 
         card.Hold = !card.Hold;
+
+        game.Alert = null;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -339,6 +347,7 @@ public class GameEngine : IGameEngine
 
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
+        game.Alert = null;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -357,6 +366,8 @@ public class GameEngine : IGameEngine
 
         game.Player.Chips = game.Player.Chips.OrderBy(x => x.Value).ToList();
 
+        game.Alert = null;
+
         return _gameRepo.AddOrUpdate(game);
     }
 
@@ -366,6 +377,8 @@ public class GameEngine : IGameEngine
 
         game.NextBetType = request.BetType;
         game.NextBetAmount = request.Amount;
+
+        game.Alert = null;
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -382,17 +395,20 @@ public class GameEngine : IGameEngine
             game.Player.Cash += game.Pot;
             game.Player.Winnings += game.Pot / 2;
             game.AIPlayer.Winnings -= game.Pot / 2;
+            game.Alert = $"{_cardService.GetHandTitle(playerHandType)} beats {_cardService.GetHandTitle(aiHandType)} - pay {game.Player.Name}";
         }
         else if (aiHandType > playerHandType)
         {
             game.AIPlayer.Cash += game.Pot;
             game.AIPlayer.Winnings += game.Pot / 2;
             game.Player.Winnings -= game.Pot / 2;
+            game.Alert = $"{_cardService.GetHandTitle(aiHandType)} beats {_cardService.GetHandTitle(playerHandType)} - pay AI player";
         }
         else
         {
             game.Player.Cash += game.Pot / 2;
             game.AIPlayer.Cash += game.Pot / 2;
+            game.Alert = $"It's a tie - pay all";
         }
 
         game.Pot = 0;

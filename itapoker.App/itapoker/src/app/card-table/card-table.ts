@@ -10,11 +10,10 @@ import { HttpClient } from '@angular/common/http';
 })
 export class CardTable {
 
-  errorMessage = "";
-  errorMessageTimerRunning = false;
-  errorMessageVisible = false;
-  handTitleTimerRunning = false;
-  handTitleVisible = false;
+  alertInterval = 0;
+  alertMessage = "";
+  alertTimerRunning = false;
+  alertVisible = false;
 
   constructor(
     private http: HttpClient) {
@@ -40,18 +39,21 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/chip/add", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, false),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
-  apiCallSuccess(response: any) {
+  apiCallSuccess(response: any, renderAlert: boolean) {
     this.saveGame(response);
+
+    if (renderAlert)
+      this.renderAlert(this.getGame().alert);
   }
 
   apiCallError(error: any) {
-    this.renderErrorMessage(error);
+    this.renderAlert(error);
   }
 
   btnAnteClick() {
@@ -63,7 +65,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/anteup", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -79,7 +81,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -95,7 +97,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -110,10 +112,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/deal", request).subscribe({
-      next: value => { 
-        this.apiCallSuccess(value);
-        this.renderFlashingHandTitle();
-      },
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -130,10 +129,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/draw", request).subscribe({
-      next: value => {
-        this.apiCallSuccess(value);
-        this.renderFlashingHandTitle();
-      },
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -149,7 +145,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -164,7 +160,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/next", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -181,7 +177,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -196,7 +192,7 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/showdown", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, true),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
@@ -218,10 +214,17 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/hold", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, false),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
+  }
+
+  clearAlert() {
+      clearInterval(this.alertInterval);
+      this.alertTimerRunning = false;
+      this.alertVisible = false;
+      this.alertMessage = "";
   }
 
   getGame() {
@@ -241,37 +244,6 @@ export class CardTable {
       case 6: return "BetPostDraw";
       case 7: return "Showdown";
       case 8: return "GameOver";
-
-      default: return "";
-    }
-  }
-
-  getHandTitle(handType: number) {
-
-    switch (handType)
-    {
-      case 2: return "Two High";
-      case 3: return "Three High";
-      case 4: return "Four High";
-      case 5: return "Five High";
-      case 6: return "Six High";
-      case 7: return "Seven High";
-      case 8: return "Eight High";
-      case 9: return "Nine High";
-      case 10: return "Ten High";
-      case 11: return "Jack High";
-      case 12: return "Queen High";
-      case 13: return "King High";
-      case 14: return "Ace High";
-      case 20: return "One Pair";
-      case 30: return "Two Pair";
-      case 40: return "Three Of A Kind";
-      case 50: return "Straight";
-      case 60: return "Flush";
-      case 70: return "Full House";
-      case 80: return "Four Of A Kind";
-      case 90: return "Straight Flush";
-      case 100: return "Royal Flush";
 
       default: return "";
     }
@@ -345,40 +317,28 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/chip/remove", request).subscribe({
-      next: value => this.apiCallSuccess(value),
+      next: value => this.apiCallSuccess(value, false),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
-  renderErrorMessage(error: any) {
+  renderAlert(message: any) {
 
-    this.errorMessage = error.error;
-    this.errorMessageTimerRunning = true;
+    if (!message)
+      return;
 
-    var interval = setInterval(() => {
-      this.errorMessageVisible = !this.errorMessageVisible;
+    this.clearAlert();
+
+    this.alertMessage = message;
+    this.alertTimerRunning = true;
+
+    this.alertInterval = setInterval(() => {
+      this.alertVisible = !this.alertVisible;
     }, 1000);
 
     setTimeout(() => {
-      clearInterval(interval);
-      this.errorMessageTimerRunning = false;
-      this.errorMessageVisible = false;
-    }, 10000);
-  }
-
-  renderFlashingHandTitle() {
-
-    this.handTitleTimerRunning = true;
-
-    var interval = setInterval(() => {
-      this.handTitleVisible = !this.handTitleVisible;
-    }, 1000);
-
-    setTimeout(() => {
-      clearInterval(interval);
-      this.handTitleTimerRunning = false;
-      this.handTitleVisible = false;
+      this.clearAlert();
     }, 10000);
   }
 

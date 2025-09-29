@@ -10,6 +10,37 @@ public class CardService : ICardService
     {
     }
 
+    public string GetHandTitle(HandType handType)
+    {
+        switch (handType)
+        {
+            case HandType.TwoHigh: return "Two High";
+            case HandType.ThreeHigh: return "Three High";
+            case HandType.FourHigh: return "Four High";
+            case HandType.FiveHigh: return "Five High";
+            case HandType.SixHigh: return "Six High";
+            case HandType.SevenHigh: return "Seven High";
+            case HandType.EightHigh: return "Eight High";
+            case HandType.NineHigh: return "Nine High";
+            case HandType.TenHigh: return "Ten High";
+            case HandType.JackHigh: return "Jack High";
+            case HandType.QueenHigh: return "Queen High";
+            case HandType.KingHigh: return "King High";
+            case HandType.AceHigh: return "Ace High";
+            case HandType.OnePair: return "One Pair";
+            case HandType.TwoPair: return "Two Pair";
+            case HandType.ThreeOfAKind: return "Three Of A Kind";
+            case HandType.Straight: return "Straight";
+            case HandType.Flush: return "Flush";
+            case HandType.FullHouse: return "Full House";
+            case HandType.FourOfAKind: return "Four Of A Kind";
+            case HandType.StraightFlush: return "Straight Flush";
+            case HandType.RoyalFlush: return "Royal Flush";
+
+            default: return "";
+        }
+    }
+
     public HandType GetHandType(List<Card> cards)
     {
         if (IsRoyalFlush(cards))

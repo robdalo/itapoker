@@ -20,6 +20,7 @@ public class GameRepo : IGameRepo
             existing = new Game();
 
         existing.GameId = game.GameId;
+        existing.Alert = game.Alert;
         existing.Ante = game.Ante;
         existing.Cash = game.Cash;
         existing.Limit = game.Limit;
