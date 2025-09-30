@@ -86,17 +86,38 @@
         </div>
     </div>
 
+    <div class="card-table-sub-footer">
+        <div class="card-table-chips">
+            <div (click)="addChipClick(5)">
+                <img src="images/chips/light-blue.png" alt="Light Blue Chip" />
+                <span>5</span>
+            </div>
+            <div (click)="addChipClick(10)">
+                <img src="images/chips/red.png" alt="Red Chip" />
+                <span>10</span>
+            </div>
+            <div (click)="addChipClick(25)">
+                <img src="images/chips/dark-red.png" alt="Dark Red Chip" />
+                <span>25</span>
+            </div>
+            <div (click)="addChipClick(50)">
+                <img src="images/chips/blue.png" alt="Blue Chip" />
+                <span>50</span>
+            </div>
+        </div>
+    </div>    
+
     <div class="card-table-footer">
         <div class="card-table-footer-left">
             <h3>Hand: {{ getGame().hand }}</h3>
             <h3>Cash: ${{ getGame().player.cash }}</h3>
             <h3 *ngIf="getGame().player.winnings >= 0">Win: ${{ getGame().player.winnings }}</h3>
-            <h3 *ngIf="getGame().player.winnings < 0" class="loss">Loss: ${{ getGame().player.winnings * -1 }}</h3>        
+            <h3 *ngIf="getGame().player.winnings < 0" class="loss">Loss: ${{ getGame().player.winnings * -1 }}</h3>         
         </div>
         <div class="card-table-footer-centre">
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
             <button type="button" *ngIf="isDeal()" (click)="btnDealClick()">Deal</button>
-            <!--<button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnFoldClick()">Fold</button>-->
+            <button type="button" *ngIf="isBet() && isFoldAvailable()" (click)="btnFoldClick()" class="fold">Fold</button>               
             <button type="button" *ngIf="isBet() && isCheckAvailable()" (click)="btnCheckClick()">Check</button>
             <button type="button" *ngIf="isBet() && isCallAvailable()" (click)="btnCallClick()">Call</button>
             <button type="button" *ngIf="isBet() && isRaiseAvailable()" (click)="btnRaiseClick()">Raise</button>
@@ -105,24 +126,7 @@
             <button type="button" *ngIf="isGameOver()" (click)="btnNextClick()">Next</button>
         </div>
         <div class="card-table-footer-right">
-            <div class="card-table-chips">
-                <div (click)="addChipClick(5)">
-                    <img src="images/chips/light-blue.png" alt="Light Blue Chip" />
-                    <span>5</span>
-                </div>
-                <div (click)="addChipClick(10)">
-                    <img src="images/chips/red.png" alt="Red Chip" />
-                    <span>10</span>
-                </div>
-                <div (click)="addChipClick(25)">
-                    <img src="images/chips/dark-red.png" alt="Dark Red Chip" />
-                    <span>25</span>
-                </div>
-                <div (click)="addChipClick(50)">
-                    <img src="images/chips/blue.png" alt="Blue Chip" />
-                    <span>50</span>
-                </div>
-            </div>
+
         </div>
     </div>
 </div>

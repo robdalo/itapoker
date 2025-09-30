@@ -300,12 +300,17 @@ export class CardTable {
     return game.stage == 5; // draw
   }
 
+  isFoldAvailable() {
+    var game = this.getGame();
+    return this.getPlayerBet() == 0;
+  }
+
   isGameOver() {
     var game = this.getGame();
     return game.stage == 8; // gameover
   }
 
-   isRaiseAvailable() {
+  isRaiseAvailable() {
     var game = this.getGame();
     return this.getPlayerBet() > 0 && (
            game.aiPlayer.lastBetType == 0 || // no previous bet

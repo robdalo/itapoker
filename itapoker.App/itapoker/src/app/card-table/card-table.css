@@ -1,5 +1,5 @@
 .card-table-header-right h5 { color: white; font-size: 350%; font-weight: bold; }
-.card-table-chips { margin: auto; padding-top: 4px; display: table; text-align: center; }
+.card-table-chips { margin: auto; display: table; text-align: center; }
 .card-table-chips div { width: 60px; height: 60px; float: left; margin-right: 6px; text-align: center; }
 .card-table-chips img { width: 60px; height: auto; cursor: pointer; display: block; }
 .card-table-chips span { margin-top: -40px; margin-left: -1px; color: white; font-weight: bold; display: block; cursor: pointer; }

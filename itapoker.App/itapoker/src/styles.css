@@ -11,11 +11,13 @@ h5 { font-size: 150%; font-weight: bold; color: yellow; text-transform: uppercas
 .card-table-header-centre { width: 60%; float: left; text-align: center; }
 .card-table-header-right { width: 20%; float: left; clear: right; text-align: right; }
 .card-table-sub-header { height: 30px; clear: both; padding: 12px; background: green; border-bottom: 16px solid limegreen; text-align: center; }
+.card-table-sub-footer { height: 60px; clear: both; padding: 8px; background: green; border-top: 16px solid limegreen; text-align: center; }
 .card-table-footer { height: 70px; clear: both; padding: 12px; background: limegreen; }
-.card-table-footer-left { width: 36%; float: left; text-align: left; }
-.card-table-footer-centre { width: 28%; float: left; text-align: center; }
-.card-table-footer-right { width: 36%; float: left; clear: right; text-align: right; }
+.card-table-footer-left { width: 15%; float: left; text-align: left; }
+.card-table-footer-centre { width: 70%; float: left; text-align: center; }
+.card-table-footer-right { width: 15%; float: left; clear: right; text-align: right; }
 .card-table-footer button { width: 200px; padding: 16px 0 16px 0; background: green; border-bottom: 8px solid black; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; cursor: pointer; }
+.card-table-footer button.fold { margin-right: 12px; }
 .card-table-footer button:hover { border-bottom: 8px solid yellowgreen; }
 .card-table-content { width: 100%; clear: both; padding: 24px 0 24px 0; display: table; text-align: center; }
 .card-table-content-left { width: 25%; float: left; }
