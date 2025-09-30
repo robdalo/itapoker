@@ -275,12 +275,19 @@ export class CardTable {
   isCallAvailable() {
 
     var game = this.getGame();
-    return game.aiPlayer.lastBetType == 4; // raise
+    return game.aiPlayer.lastBetType == 4 && // raise
+           this.getPlayerBet() == 0;
   }
 
   isCardsDealt() {
     var game = this.getGame();
     return game.stage > 3; // deal
+  }
+
+  isCheckAvailable() {
+    var game = this.getGame();
+    return this.getPlayerBet() == 0 &&
+           game.aiPlayer.lastBetType == 0; // no previous bet
   }
 
   isDeal() {
@@ -296,6 +303,13 @@ export class CardTable {
   isGameOver() {
     var game = this.getGame();
     return game.stage == 8; // gameover
+  }
+
+   isRaiseAvailable() {
+    var game = this.getGame();
+    return this.getPlayerBet() > 0 && (
+           game.aiPlayer.lastBetType == 0 || // no previous bet
+           game.aiPlayer.lastBetType == 4); // raise
   }
 
   isShowdown() {

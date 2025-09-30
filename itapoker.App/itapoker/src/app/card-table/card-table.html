@@ -97,9 +97,9 @@
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
             <button type="button" *ngIf="isDeal()" (click)="btnDealClick()">Deal</button>
             <!--<button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnFoldClick()">Fold</button>-->
-            <button type="button" *ngIf="isBet() && getPlayerBet() == 0" (click)="btnCheckClick()">Check</button>
-            <button type="button" *ngIf="isBet() && getPlayerBet() > 0" (click)="btnRaiseClick()">Raise</button>
+            <button type="button" *ngIf="isBet() && isCheckAvailable()" (click)="btnCheckClick()">Check</button>
             <button type="button" *ngIf="isBet() && isCallAvailable()" (click)="btnCallClick()">Call</button>
+            <button type="button" *ngIf="isBet() && isRaiseAvailable()" (click)="btnRaiseClick()">Raise</button>
             <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>
             <button type="button" *ngIf="isShowdown()" (click)="btnShowdownClick()">Showdown</button>
             <button type="button" *ngIf="isGameOver()" (click)="btnNextClick()">Next</button>

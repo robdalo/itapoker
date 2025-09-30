@@ -236,15 +236,22 @@ public class GameEngine : IGameEngine
             }
         }
 
-        // sort cards
-
         foreach (var player in game.Players)
         {
+            // sort cards
+
             player.Cards = player.Cards.OrderBy(x => x.Rank)
                                        .ThenBy(x => x.Suit)
                                        .ToList();
-                                       
+
+            // determine hand
+
             player.HandType = _cardService.GetHandType(player.Cards);
+            
+            // clear previous bets
+
+            player.LastBetAmount = 0;
+            player.LastBetType = BetType.None;
         }
 
         game.Stage = GameStage.BetPreDraw;
@@ -300,15 +307,22 @@ public class GameEngine : IGameEngine
         foreach (var card in game.Players.SelectMany(x => x.Cards))
             card.Hold = false;
 
-        // sort cards
-
         foreach (var player in game.Players)
         {
+            // sort cards
+
             player.Cards = player.Cards.OrderBy(x => x.Rank)
                                        .ThenBy(x => x.Suit)
                                        .ToList();
 
+            // determine hand
+
             player.HandType = _cardService.GetHandType(player.Cards);
+
+            // clear previous bets
+
+            player.LastBetAmount = 0;
+            player.LastBetType = BetType.None;
         }
 
         game.Stage = GameStage.BetPostDraw;
@@ -337,10 +351,12 @@ public class GameEngine : IGameEngine
     {
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        // return player cards to deck
-
         foreach (var player in game.Players)
+        {
+            // return player cards to deck
+                    
             player.Cards.Clear();
+        }
 
         game.Hand++;
         game.Stage = GameStage.Ante;
