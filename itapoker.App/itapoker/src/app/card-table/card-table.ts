@@ -262,6 +262,10 @@ export class CardTable {
     return bet;
   }
 
+  isAIPlayerHandVisible() {
+    return false;
+  }
+
   isAnte() {
     var game = this.getGame();
     return game.stage == 2; // ante up

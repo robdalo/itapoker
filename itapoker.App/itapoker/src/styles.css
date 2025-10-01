@@ -2,16 +2,20 @@ html, body, h1, h2, h3, h4, h5, ul, li, p, input, button { margin: 0; padding: 0
 html, body { background: green; }
 
 h3 { color: black; text-transform: uppercase; }
-h4 { margin: 8px 0 4px 0; font-size: 250%; font-weight: bold; color: blue; text-transform: uppercase; letter-spacing: 2px; }
+h4 { font-size: 250%; font-weight: bold; color: blue; text-transform: uppercase; letter-spacing: 2px; }
 h5 { font-size: 150%; font-weight: bold; color: yellow; text-transform: uppercase; letter-spacing: 1px; }
 
 .card-table { border: 16px solid limegreen; border-top: 0; border-bottom: 0; }
-.card-table-header { height: 65px; clear: both; padding: 12px; background: limegreen; }
+.card-table-header { height: 45px; clear: both; padding: 12px; background: limegreen; }
 .card-table-header-left { width: 20%; float: left; text-align: left; }
 .card-table-header-centre { width: 60%; float: left; text-align: center; }
 .card-table-header-right { width: 20%; float: left; clear: right; text-align: right; }
 .card-table-sub-header { height: 30px; clear: both; padding: 12px; background: green; border-bottom: 16px solid limegreen; text-align: center; }
-.card-table-sub-footer { height: 60px; clear: both; padding: 8px; background: green; border-top: 16px solid limegreen; text-align: center; }
+.card-table-sub-footer { height: 60px; clear: both; padding: 12px; background: green; border-top: 16px solid limegreen; text-align: center; }
+.card-table-sub-footer-left { width: 15%; float: left; text-align: left; }
+.card-table-sub-footer-centre { width: 70%; float: left; text-align: center; }
+.card-table-sub-footer-right { width: 15%; float: left; clear: right; text-align: right; }
+.card-table-sub-footer-right h5 { font-size: 300%; color: white; }
 .card-table-footer { height: 70px; clear: both; padding: 12px; background: limegreen; }
 .card-table-footer-left { width: 15%; float: left; text-align: left; }
 .card-table-footer-centre { width: 70%; float: left; text-align: center; }
@@ -19,7 +23,7 @@ h5 { font-size: 150%; font-weight: bold; color: yellow; text-transform: uppercas
 .card-table-footer button { width: 200px; padding: 16px 0 16px 0; background: green; border-bottom: 8px solid black; color: white; font-size: 150%; font-weight: bold; text-align: center; text-transform: uppercase; cursor: pointer; }
 .card-table-footer button.fold { margin-right: 12px; }
 .card-table-footer button:hover { border-bottom: 8px solid yellowgreen; }
-.card-table-content { width: 100%; clear: both; padding: 24px 0 24px 0; display: table; text-align: center; }
+.card-table-content { width: 100%; clear: both; padding: 16px 0 16px 0; display: table; text-align: center; }
 .card-table-content-left { width: 25%; float: left; }
 .card-table-content-centre { width: 50%; float: left; }
 .card-table-content-right { width: 25%; float: left; }
