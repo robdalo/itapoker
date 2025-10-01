@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-card-table',
@@ -15,8 +16,13 @@ export class CardTable {
   alertTimerRunning = false;
   alertVisible = false;
 
+  renderPlayerAnteInterval = 0;
+  renderPlayerAnteVisible = false;
+  renderPlayerAnteChips: any[] = [];
+
   constructor(
-    private http: HttpClient) {
+    private http: HttpClient,
+    private router: Router) {
   }
 
   addChipClick(value: number) {
@@ -45,22 +51,10 @@ export class CardTable {
     });
   }
 
-  apiCallSuccess(response: any, renderAlert: boolean) {
-    
-    this.saveGame(response);
-    
-    if (renderAlert)
-      this.renderAlert(this.getGame().alert);
-  }
-
-  apiCallError(error: any) {
-    this.renderAlert(error);
-  }
-
-  btnAnteClick() {
+  anteUp() {
 
     var game = this.getGame();
-
+    
     var request = {
       GameId: game.gameId
     };
@@ -70,6 +64,33 @@ export class CardTable {
       error: err => this.apiCallError(err),
       complete: () => {}
     });
+  }
+
+  apiCallSuccess(response: any, renderAlert: boolean) {
+    
+    this.saveGame(response);
+    
+    var game = this.getGame();
+
+    if (renderAlert)
+      this.renderAlert(game.alert);
+  }
+
+  apiCallError(error: any) {
+    this.renderAlert(error);
+  }
+
+  btnAnteClick() {
+
+    this.renderPlayerAnte();
+    
+    var wait = setInterval(() => {
+
+      if (!this.renderPlayerAnteVisible) {
+        clearInterval(wait);
+        this.anteUp();
+      }    
+    }, 500);
   }
 
   btnCallClick() {
@@ -184,6 +205,11 @@ export class CardTable {
     });
   }
 
+  btnRetireClick() {
+  
+    this.router.navigate(["/"]);
+  }
+
   btnShowdownClick() {
 
     var game = this.getGame();
@@ -228,6 +254,19 @@ export class CardTable {
       this.alertMessage = "";
   }
 
+  getBetType(betType: number) {
+
+    switch(betType) {
+
+      case 1: return "Call";
+      case 2: return "Check";
+      case 3: return "Fold";
+      case 4: return "Raise";
+
+      default: return "";
+    }
+  }
+
   getGame() {
     var json = localStorage.getItem("game");
     return json ? JSON.parse(json) : null;
@@ -264,6 +303,11 @@ export class CardTable {
 
   isAIPlayerHandVisible() {
     return false;
+  }
+
+  isAIPlayerLastBetVisible() {
+    var game = this.getGame();
+    return game.stage != 8; // game over
   }
 
   isAnte() {
@@ -364,6 +408,40 @@ export class CardTable {
     setTimeout(() => {
       this.clearAlert();
     }, 10000);
+  }
+
+  renderPlayerAnte() {
+
+    var game = this.getGame();
+
+    this.renderPlayerAnteChips = [
+      { url: "images/chips/light-blue.png", title: "Light Blue Chip", value: 5, quantity: 1, total: 5, render: false }
+    ];
+
+    this.renderPlayerAnteVisible = true;
+
+    var index = 0;
+
+    this.renderPlayerAnteInterval = setInterval(() => {
+
+      if (index >= this.renderPlayerAnteChips.length) {
+        
+        this.renderPlayerAnteVisible = false;
+        
+        game.player.chips = [];
+        this.saveGame(game);
+
+        clearInterval(this.renderPlayerAnteInterval);
+      }
+      else {
+
+        game.player.chips.push(this.renderPlayerAnteChips[index]);
+
+        this.saveGame(game);
+
+        this.renderPlayerAnteChips[index++].render = true;
+      }
+    }, 2000);
   }
 
   saveGame(game: any) {

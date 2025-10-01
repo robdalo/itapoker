@@ -15,6 +15,7 @@ public class SecurityService : ISecurityService
         if (game.Stage == GameStage.GameOver)
             return;
 
+        game.AIPlayer.Hand = "";
         game.AIPlayer.HandType = HandType.None;
 
         foreach (var card in game.AIPlayer.Cards)

@@ -14,8 +14,17 @@
     </div>
 
     <div class="card-table-sub-header">
-        <h5 *ngIf="!alertTimerRunning">{{ getGame().subTitle }}</h5>
-        <h5 *ngIf="alertTimerRunning && alertVisible">{{ alertMessage }}</h5>
+        <div class="card-table-sub-header-left">
+            <h5>{{ getGame().hand.toString().padStart(3, '0') }}</h5>
+        </div>
+        <div class="card-table-sub-header-centre">
+            <h5 *ngIf="!alertTimerRunning">{{ getGame().subTitle }}</h5>
+            <h5 *ngIf="alertTimerRunning && alertVisible">{{ alertMessage }}</h5>
+            <br *ngIf="alertTimerRunning && !alertVisible" />
+        </div>
+        <div class="card-table-sub-header-right">
+            <h5>${{ getGame().pot }}</h5>
+        </div>
     </div>
 
     <div class="card-table-content">
@@ -28,7 +37,17 @@
             </div>
             <div class="card"><br /></div>
             <div class="card"><br /></div>
-            <div class="end"><br /></div>
+            <div class="end">
+                <br *ngIf="!renderPlayerAnteVisible" />
+                <div *ngIf="renderPlayerAnteVisible" class="card-table-bets">
+                    <div *ngFor="let chip of renderPlayerAnteChips; let i = index">
+                        <div *ngIf="chip.render">
+                            <img [src]="chip.url" [alt]="chip.title" />
+                            <span>{{ chip.quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="card-table-player-hand" *ngIf="isCardsDealt() && isAIPlayerHandVisible()">
@@ -48,13 +67,8 @@
             <div class="card">
                 <img src="{{ getGame().aiPlayer.cards[4].url }}" alt="{{ getGame().aiPlayer.cards[4].title }}" />
             </div>
-            <div class="end">
-                <div *ngIf="getPlayerBet() > 0">
-                    <h5>${{ getPlayerBet() }}</h5>
-                </div>
-            </div>
+            <div class="end"></div>
         </div>
-
         <div class="card-table-player-hand" *ngIf="isCardsDealt()">
             <div class="end"><br /></div>
             <div class="card">
@@ -91,7 +105,11 @@
     </div>
 
     <div class="card-table-sub-footer">
-        <div class="card-table-sub-footer-left"><br /></div>
+        <div class="card-table-sub-footer-left">
+            <h5 *ngIf="isAnte() || isBet()">${{ getGame().aiPlayer.lastBetAmount }} <span>{{ getBetType(getGame().aiPlayer.lastBetType) }}</span></h5>
+            <h4 *ngIf="isGameOver()">{{ getGame().aiPlayer.hand }}</h4>
+            <br *ngIf="!isBet() && !isGameOver()" />
+        </div>
         <div class="card-table-sub-footer-centre">
             <div class="card-table-chips">
                 <div (click)="addChipClick(5)">
@@ -106,26 +124,25 @@
                     <img src="images/chips/dark-red.png" alt="Dark Red Chip" />
                     <span>25</span>
                 </div>
-                <div (click)="addChipClick(50)">
+                <div (click)="addChipClick(50)" style="margin-right: 0">
                     <img src="images/chips/blue.png" alt="Blue Chip" />
                     <span>50</span>
-                </div>
-                <div>
-                    <img src="images/chips/blue.png" alt="Blue Chip" />
-                    <span>100</span>
                 </div>
             </div>
         </div>
         <div class="card-table-sub-footer-right">
-            <h5>${{ getGame().pot }}</h5>
+            <h5 *ngIf="isAnte() || isBet()">${{ getPlayerBet() }}</h5>
+            <h4 *ngIf="isGameOver()">{{ getGame().player.hand }}</h4>
+            <br *ngIf="!isBet() && !isGameOver()" />
         </div>
     </div>    
 
     <div class="card-table-footer">
         <div class="card-table-footer-left">
-            <h3>Cash: ${{ getGame().player.cash }}</h3>
-            <h3 *ngIf="getGame().player.winnings >= 0">Win: ${{ getGame().player.winnings }}</h3>
-            <h3 *ngIf="getGame().player.winnings < 0" class="loss">Loss: ${{ getGame().player.winnings * -1 }}</h3>         
+            <h3>AI Player</h3>
+            <h3>Cash: ${{ getGame().aiPlayer.cash }}</h3>
+            <h3 *ngIf="getGame().aiPlayer.winnings >= 0">Win: ${{ getGame().aiPlayer.winnings }}</h3>
+            <h3 *ngIf="getGame().aiPlayer.winnings < 0" class="loss">Loss: ${{ getGame().aiPlayer.winnings * -1 }}</h3>
         </div>
         <div class="card-table-footer-centre">
             <button type="button" *ngIf="isAnte()" (click)="btnAnteClick()">Ante</button>
@@ -136,10 +153,14 @@
             <button type="button" *ngIf="isBet() && isRaiseAvailable()" (click)="btnRaiseClick()">Raise</button>
             <button type="button" *ngIf="isDraw()" (click)="btnDrawClick()">Draw</button>
             <button type="button" *ngIf="isShowdown()" (click)="btnShowdownClick()">Showdown</button>
+            <button type="button" *ngIf="isGameOver()" (click)="btnRetireClick()" class="fold">Retire</button>
             <button type="button" *ngIf="isGameOver()" (click)="btnNextClick()">Next</button>
         </div>
         <div class="card-table-footer-right">
-
+            <h3>Player</h3>
+            <h3>Cash: ${{ getGame().player.cash }}</h3>
+            <h3 *ngIf="getGame().player.winnings >= 0">Win: ${{ getGame().player.winnings }}</h3>
+            <h3 *ngIf="getGame().player.winnings < 0" class="loss">Loss: ${{ getGame().player.winnings * -1 }}</h3>     
         </div>
     </div>
 </div>

@@ -258,7 +258,7 @@ public class GameEngine : IGameEngine
         
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
-        game.Alert = $"You have {_cardService.GetHandTitle(game.Player.HandType)}";
+        game.Alert = $"{_cardService.GetHandTitle(game.Player.HandType)}";
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -328,7 +328,7 @@ public class GameEngine : IGameEngine
         game.Stage = GameStage.BetPostDraw;
         game.Title = GetTitle(game.Stage);
         game.SubTitle = GetSubTitle(game.Stage);
-        game.Alert = $"You have {_cardService.GetHandTitle(game.Player.HandType)}";
+        game.Alert = $"{_cardService.GetHandTitle(game.Player.HandType)}";
 
         return _gameRepo.AddOrUpdate(game);
     }
@@ -354,8 +354,13 @@ public class GameEngine : IGameEngine
         foreach (var player in game.Players)
         {
             // return player cards to deck
-                    
+
             player.Cards.Clear();
+
+            // clear last bets
+
+            player.LastBetAmount = 0;
+            player.LastBetType = BetType.None;
         }
 
         game.Hand++;
@@ -411,22 +416,24 @@ public class GameEngine : IGameEngine
             game.Player.Cash += game.Pot;
             game.Player.Winnings += game.Pot / 2;
             game.AIPlayer.Winnings -= game.Pot / 2;
-            game.Alert = $"{_cardService.GetHandTitle(playerHandType)} beats {_cardService.GetHandTitle(aiHandType)} - pay {game.Player.Name}";
+            game.Alert = $"Pay {game.Player.Name}";
         }
         else if (aiHandType > playerHandType)
         {
             game.AIPlayer.Cash += game.Pot;
             game.AIPlayer.Winnings += game.Pot / 2;
             game.Player.Winnings -= game.Pot / 2;
-            game.Alert = $"{_cardService.GetHandTitle(aiHandType)} beats {_cardService.GetHandTitle(playerHandType)} - pay AI player";
+            game.Alert = $"Pay AI player";
         }
         else
         {
             game.Player.Cash += game.Pot / 2;
             game.AIPlayer.Cash += game.Pot / 2;
-            game.Alert = $"It's a tie - pay all";
+            game.Alert = $"Return all bets";
         }
 
+        game.Player.Hand = _cardService.GetHandTitle(playerHandType);
+        game.AIPlayer.Hand = _cardService.GetHandTitle(aiHandType);
         game.Pot = 0;
         game.Stage = GameStage.GameOver;
         game.Title = GetTitle(game.Stage);
@@ -505,7 +512,7 @@ public class GameEngine : IGameEngine
             case GameStage.Deal: return "Shuffle and deal cards";
             case GameStage.Draw: return "Hold cards before draw";
             case GameStage.GameOver: return "Play the next hand";
-            case GameStage.Showdown: return "Highest ranking hand wins pot";
+            case GameStage.Showdown: return "Highest rank hand wins pot";
 
             default: return "";
         }
