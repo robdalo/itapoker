@@ -29,7 +29,17 @@
 
     <div class="card-table-content">
         <div class="card-table-player-hand" *ngIf="!isCardsDealt()">
-            <div class="end"><br /></div>
+            <div class="end">
+                <br *ngIf="renderAnteUpInterval == 0" />
+                <div *ngIf="renderAnteUpInterval > 0" class="card-table-bets">
+                    <div *ngFor="let chip of getGame().aiPlayer.chips; let i = index">
+                        <div *ngIf="chip.visible">
+                            <img [src]="chip.url" [alt]="chip.title" />
+                            <span>{{ chip.quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="card"><br /></div>
             <div class="card"><br /></div>
             <div class="card">
@@ -38,10 +48,10 @@
             <div class="card"><br /></div>
             <div class="card"><br /></div>
             <div class="end">
-                <br *ngIf="!renderPlayerAnteVisible" />
-                <div *ngIf="renderPlayerAnteVisible" class="card-table-bets">
-                    <div *ngFor="let chip of renderPlayerAnteChips; let i = index">
-                        <div *ngIf="chip.render">
+                <br *ngIf="renderAnteUpInterval == 0" />
+                <div *ngIf="renderAnteUpInterval > 0" class="card-table-bets">
+                    <div *ngFor="let chip of getGame().player.chips; let i = index">
+                        <div *ngIf="chip.visible">
                             <img [src]="chip.url" [alt]="chip.title" />
                             <span>{{ chip.quantity }}</span>
                         </div>
@@ -52,44 +62,16 @@
 
         <div class="card-table-player-hand" *ngIf="isCardsDealt() && isAIPlayerHandVisible()">
             <div class="end"><br /></div>
-            <div class="card">
-                <img src="{{ getGame().aiPlayer.cards[0].url }}" alt="{{ getGame().aiPlayer.cards[0].title }}" />
-            </div>
-            <div class="card">
-                <img src="{{ getGame().aiPlayer.cards[1].url }}" alt="{{ getGame().aiPlayer.cards[1].title }}" />
-            </div>
-            <div class="card">
-                <img src="{{ getGame().aiPlayer.cards[2].url }}" alt="{{ getGame().aiPlayer.cards[2].title }}" />
-            </div>
-            <div class="card">
-                <img src="{{ getGame().aiPlayer.cards[3].url }}" alt="{{ getGame().aiPlayer.cards[3].title }}" />
-            </div>
-            <div class="card">
-                <img src="{{ getGame().aiPlayer.cards[4].url }}" alt="{{ getGame().aiPlayer.cards[4].title }}" />
+            <div *ngFor="let card of getGame().aiPlayer.cards; let i = index" class="card">
+                <img src="{{ card.url }}" alt="{{ card.title }}" />
             </div>
             <div class="end"></div>
         </div>
         <div class="card-table-player-hand" *ngIf="isCardsDealt()">
             <div class="end"><br /></div>
-            <div class="card">
-                <img src="{{ getGame().player.cards[0].url }}" alt="{{ getGame().player.cards[0].title }}" (click)="cardClick(getGame().player.cards[0].rank, getGame().player.cards[0].suit)" />
-                <span *ngIf="getGame().player.cards[0].hold">HOLD</span>
-            </div>
-            <div class="card">
-                <img src="{{ getGame().player.cards[1].url }}" alt="{{ getGame().player.cards[1].title }}" (click)="cardClick(getGame().player.cards[1].rank, getGame().player.cards[1].suit)" />
-                <span *ngIf="getGame().player.cards[1].hold">HOLD</span>
-            </div>
-            <div class="card">
-                <img src="{{ getGame().player.cards[2].url }}" alt="{{ getGame().player.cards[2].title }}" (click)="cardClick(getGame().player.cards[2].rank, getGame().player.cards[2].suit)" />
-                <span *ngIf="getGame().player.cards[2].hold">HOLD</span>
-            </div>
-            <div class="card">
-                <img src="{{ getGame().player.cards[3].url }}" alt="{{ getGame().player.cards[3].title }}" (click)="cardClick(getGame().player.cards[3].rank, getGame().player.cards[3].suit)" />
-                <span *ngIf="getGame().player.cards[3].hold">HOLD</span>
-            </div>
-            <div class="card">
-                <img src="{{ getGame().player.cards[4].url }}" alt="{{ getGame().player.cards[4].title }}" (click)="cardClick(getGame().player.cards[4].rank, getGame().player.cards[4].suit)" />
-                <span *ngIf="getGame().player.cards[4].hold">HOLD</span>
+            <div *ngFor="let card of getGame().player.cards; let i = index" class="card">
+                <img *ngIf="card.visible" src="{{ getCardUrl(i) }}" alt="{{ card.title }}" (click)="cardClick(card.rank, card.suit)" />
+                <span *ngIf="card.hold">HOLD</span>
             </div>
             <div class="end">
                 <div class="card-table-bets">
@@ -106,7 +88,8 @@
 
     <div class="card-table-sub-footer">
         <div class="card-table-sub-footer-left">
-            <h5 *ngIf="isAnte() || isBet()">${{ getGame().aiPlayer.lastBetAmount }} <span>{{ getBetType(getGame().aiPlayer.lastBetType) }}</span></h5>
+            <h5 *ngIf="isAnte()">${{ getAIPlayerBet() }}</h5>
+            <h5 *ngIf="isBet()">${{ getGame().aiPlayer.lastBetAmount }} <span>{{ getBetType(getGame().aiPlayer.lastBetType) }}</span></h5>
             <h4 *ngIf="isGameOver()">{{ getGame().aiPlayer.hand }}</h4>
             <br *ngIf="!isBet() && !isGameOver()" />
         </div>

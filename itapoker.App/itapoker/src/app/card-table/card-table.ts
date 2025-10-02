@@ -16,9 +16,8 @@ export class CardTable {
   alertTimerRunning = false;
   alertVisible = false;
 
-  renderPlayerAnteInterval = 0;
-  renderPlayerAnteVisible = false;
-  renderPlayerAnteChips: any[] = [];
+  renderAnteUpInterval = 0;
+  renderPlayerHandInterval = 0;
 
   constructor(
     private http: HttpClient,
@@ -51,19 +50,18 @@ export class CardTable {
     });
   }
 
-  anteUp() {
-
-    var game = this.getGame();
+  anteUpSuccess(response: any) {
     
-    var request = {
-      GameId: game.gameId
-    };
+    this.saveGame(response);
+    this.renderAnteUp();
+    
+    var wait = setInterval(() => {
 
-    this.http.post("http://localhost:5174/game/anteup", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+      if (this.renderAnteUpInterval == 0) {
+        clearInterval(wait);
+        this.renderAlert(this.getGame().alert);
+      }    
+    }, 500);
   }
 
   apiCallSuccess(response: any, renderAlert: boolean) {
@@ -82,15 +80,17 @@ export class CardTable {
 
   btnAnteClick() {
 
-    this.renderPlayerAnte();
+    var game = this.getGame();
     
-    var wait = setInterval(() => {
+    var request = {
+      GameId: game.gameId
+    };
 
-      if (!this.renderPlayerAnteVisible) {
-        clearInterval(wait);
-        this.anteUp();
-      }    
-    }, 500);
+    this.http.post("http://localhost:5174/game/anteup", request).subscribe({
+      next: value => this.anteUpSuccess(value),
+      error: err => this.apiCallError(err),
+      complete: () => {}
+    });
   }
 
   btnCallClick() {
@@ -126,7 +126,7 @@ export class CardTable {
   }
 
   btnDealClick() {
-    
+
     var game = this.getGame();
 
     var request = {
@@ -134,10 +134,24 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/deal", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: value => this.dealSuccess(value),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
+  }
+
+  dealSuccess(response: any) {
+
+    this.saveGame(response);
+    this.renderPlayerHand();
+
+    var wait = setInterval(() => {
+
+      if (this.renderPlayerHandInterval == 0) {
+        clearInterval(wait);
+        this.renderAlert(this.getGame().alert);
+      }    
+    }, 500);
   }
 
   btnDrawClick() {
@@ -254,6 +268,18 @@ export class CardTable {
       this.alertMessage = "";
   }
 
+  getAIPlayerBet() {
+
+    var bet = 0;
+    var chips = this.getGame().aiPlayer.chips as any[];
+
+    chips.forEach(x => {
+      bet += x.total;
+    });
+
+    return bet;
+  }
+
   getBetType(betType: number) {
 
     switch(betType) {
@@ -265,6 +291,16 @@ export class CardTable {
 
       default: return "";
     }
+  }
+
+  getCardUrl(index: number) {
+
+    var card = this.getGame().player.cards[index];
+    
+    if (!card.reveal)
+      return "images/cards/back.png";
+
+    return card.url;
   }
 
   getGame() {
@@ -410,38 +446,83 @@ export class CardTable {
     }, 10000);
   }
 
-  renderPlayerAnte() {
+  renderAnteUp() {
 
     var game = this.getGame();
 
-    this.renderPlayerAnteChips = [
-      { url: "images/chips/light-blue.png", title: "Light Blue Chip", value: 5, quantity: 1, total: 5, render: false }
+    var pot = game.pot;
+
+    game.pot = 0;
+
+    this.saveGame(game);
+
+    var anteUpChips = [
+      { url: "images/chips/light-blue.png", title: "Light Blue Chip", value: 5, quantity: 1, total: 5, visible: false }
     ];
 
-    this.renderPlayerAnteVisible = true;
+    game.player.chips = JSON.parse(JSON.stringify(anteUpChips));
+    game.aiPlayer.chips = JSON.parse(JSON.stringify(anteUpChips));
 
     var index = 0;
+    var renderAIPlayer = false;
 
-    this.renderPlayerAnteInterval = setInterval(() => {
+    this.renderAnteUpInterval = setInterval(() => {
+      if (!renderAIPlayer) {
+        if (index >= anteUpChips.length) {        
+          index = 0;
+          renderAIPlayer = true;
+        }
+        else {
 
-      if (index >= this.renderPlayerAnteChips.length) {
-        
-        this.renderPlayerAnteVisible = false;
-        
-        game.player.chips = [];
-        this.saveGame(game);
-
-        clearInterval(this.renderPlayerAnteInterval);
+          game.player.chips[index++].visible = true;
+          this.saveGame(game);
+        }
       }
       else {
-
-        game.player.chips.push(this.renderPlayerAnteChips[index]);
-
-        this.saveGame(game);
-
-        this.renderPlayerAnteChips[index++].render = true;
+        if (index >= anteUpChips.length) {
+          clearInterval(this.renderAnteUpInterval);
+          game.player.chips = [];
+          game.aiPlayer.chips = [];
+          game.pot = pot;
+          this.saveGame(game);
+        }
+        else {
+          game.aiPlayer.chips[index++].visible = true;
+          this.saveGame(game);
+        }       
       }
-    }, 2000);
+    }, 1000);
+  }
+
+  renderPlayerHand() {
+
+    var game = this.getGame();
+
+    var index = 0;
+    var reveal = false;
+
+    this.renderPlayerHandInterval = setInterval(() => {
+
+      if (!reveal) {
+        if (index >= game.player.cards.length) {
+          reveal = true;
+          index--;
+        }
+        else {
+          game.player.cards[index++].visible = true;
+          this.saveGame(game);
+        }
+      }
+      else {
+        if (index < 0) {
+          clearInterval(this.renderPlayerHandInterval);
+        }
+        else {
+          game.player.cards[index--].reveal = true;
+          this.saveGame(game);
+        }
+      }
+    }, 500);
   }
 
   saveGame(game: any) {
