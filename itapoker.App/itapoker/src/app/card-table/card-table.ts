@@ -13,11 +13,10 @@ export class CardTable {
 
   alertInterval = 0;
   alertMessage = "";
-  alertTimerRunning = false;
   alertVisible = false;
 
   renderAnteUpInterval = 0;
-  renderPlayerHandInterval = 0;
+  renderDealInterval = 0;
 
   constructor(
     private http: HttpClient,
@@ -26,52 +25,38 @@ export class CardTable {
 
   addChipClick(value: number) {
 
-    var game = this.getGame();
-
-    // chips can only be added during pre draw and post draw betting
-
-    if (game.stage != 4 && game.stage != 6)
-      return;
-
-    // chips can only be added up to the game limit
-
-    if (this.getPlayerBet() + value > this.getGame().limit)
+    if (!this.validateAddChip(value))
       return;
 
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       Value: value
     };
 
     this.http.post("http://localhost:5174/game/chip/add", request).subscribe({
-      next: value => this.apiCallSuccess(value, false),
+      next: response => this.addChipSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
+  addChipSuccess(response: any) {
+    this.showAllCards(response);
+    this.showAllChips(response);
+    this.saveGame(response);
+  }
+
   anteUpSuccess(response: any) {
     
-    this.saveGame(response);
     this.renderAnteUp();
     
     var wait = setInterval(() => {
-
       if (this.renderAnteUpInterval == 0) {
         clearInterval(wait);
-        this.renderAlert(this.getGame().alert);
+        this.saveGame(response);
+        this.renderAlert(response.alert);
       }    
     }, 500);
-  }
-
-  apiCallSuccess(response: any, renderAlert: boolean) {
-    
-    this.saveGame(response);
-    
-    var game = this.getGame();
-
-    if (renderAlert)
-      this.renderAlert(game.alert);
   }
 
   apiCallError(error: any) {
@@ -79,11 +64,8 @@ export class CardTable {
   }
 
   btnAnteClick() {
-
-    var game = this.getGame();
-    
     var request = {
-      GameId: game.gameId
+      GameId: this.getGame().gameId
     };
 
     this.http.post("http://localhost:5174/game/anteup", request).subscribe({
@@ -94,64 +76,41 @@ export class CardTable {
   }
 
   btnCallClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       BetType: 1 // call
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.callSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnCheckClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       BetType: 2 // check
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.checkSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnDealClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId
+      GameId: this.getGame().gameId
     };
 
     this.http.post("http://localhost:5174/game/deal", request).subscribe({
-      next: value => this.dealSuccess(value),
+      next: response => this.dealSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
-  }
-
-  dealSuccess(response: any) {
-
-    this.saveGame(response);
-    this.renderPlayerHand();
-
-    var wait = setInterval(() => {
-
-      if (this.renderPlayerHandInterval == 0) {
-        clearInterval(wait);
-        this.renderAlert(this.getGame().alert);
-      }    
-    }, 500);
   }
 
   btnDrawClick() {
@@ -165,120 +124,132 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/draw", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.drawSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnFoldClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       BetType: 3 // fold
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.foldSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnNextClick() {
-  
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId
+      GameId: this.getGame().gameId
     };
 
     this.http.post("http://localhost:5174/game/next", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.nextSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnRaiseClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       BetType: 4, // raise
-      Amount: this.getPlayerBet()
+      Amount: this.getPlayerBet(this.getGame().player)
     };
 
     this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.raiseSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
   btnRetireClick() {
-  
     this.router.navigate(["/"]);
   }
 
   btnShowdownClick() {
-
-    var game = this.getGame();
-
     var request = {
-      GameId: game.gameId
+      GameId: this.getGame().gameId
     };
 
     this.http.post("http://localhost:5174/game/showdown", request).subscribe({
-      next: value => this.apiCallSuccess(value, true),
+      next: response => this.showdownSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
+  callSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);
+  }
+
+  checkSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);    
+  }
+
   cardClick(rank: number, suit: number) {
 
-    var game = this.getGame();
-
-    // cards can only be held during draw
-    
-    if (game.stage != 5)
+    if (!this.validateHold())
       return;
 
     var request = {
-      GameId: game.gameId,
+      GameId: this.getGame().gameId,
       Rank: rank,
       Suit: suit
     };
 
     this.http.post("http://localhost:5174/game/hold", request).subscribe({
-      next: value => this.apiCallSuccess(value, false),
+      next: response => this.cardClickSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
   }
 
+  cardClickSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+  }
+
   clearAlert() {
       clearInterval(this.alertInterval);
-      this.alertTimerRunning = false;
+      this.alertInterval = 0;
       this.alertVisible = false;
       this.alertMessage = "";
   }
 
-  getAIPlayerBet() {
+  dealSuccess(response: any) {
+    this.saveGame(response);
+    this.renderDeal();
 
-    var bet = 0;
-    var chips = this.getGame().aiPlayer.chips as any[];
-
-    chips.forEach(x => {
-      bet += x.total;
-    });
-
-    return bet;
+    var wait = setInterval(() => {
+      if (this.renderDealInterval == 0) {
+        clearInterval(wait);
+        this.renderAlert(response.alert);
+      }    
+    }, 500);
   }
+
+  drawSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);
+  }
+
+  foldSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);      
+  }  
 
   getBetType(betType: number) {
 
@@ -325,12 +296,12 @@ export class CardTable {
     }
   }
 
-  getPlayerBet() {
+  getPlayerBet(player: any) {
 
     var bet = 0;
-    var chips = this.getGame().player.chips as any[];
+    var chips = player.chips as any[];
 
-    chips.forEach(x => {
+    chips.filter(x => x.visible).forEach(x => {
       bet += x.total;
     });
 
@@ -342,68 +313,68 @@ export class CardTable {
   }
 
   isAIPlayerLastBetVisible() {
-    var game = this.getGame();
-    return game.stage != 8; // game over
+    return this.getGame().stage != 8; // game over
   }
 
   isAnte() {
-    var game = this.getGame();
-    return game.stage == 2; // ante up
+    return this.getGame().stage == 2; // ante up
   }
 
   isBet() {
-    var game = this.getGame();
-    return game.stage == 4 || game.stage == 6; // bet pre draw / bet post draw
+    return this.getGame().stage == 4 || 
+           this.getGame().stage == 6; // bet pre draw / bet post draw
   }
 
   isCallAvailable() {
-
-    var game = this.getGame();
-    return game.aiPlayer.lastBetType == 4 && // raise
-           this.getPlayerBet() == 0;
+    return this.getGame().aiPlayer.lastBetType == 4 && // raise
+           this.getPlayerBet(this.getGame().player) == 0;
   }
 
   isCardsDealt() {
-    var game = this.getGame();
-    return game.stage > 3; // deal
+    return this.getGame().stage > 3; // deal
   }
 
   isCheckAvailable() {
-    var game = this.getGame();
-    return this.getPlayerBet() == 0 &&
-           game.aiPlayer.lastBetType == 0; // no previous bet
+    return this.getPlayerBet(this.getGame().player) == 0 &&
+           this.getGame().aiPlayer.lastBetType == 0; // no previous bet
   }
 
   isDeal() {
-    var game = this.getGame();
-    return game.stage == 3; // deal
+    return this.getGame().stage == 3; // deal
   }
 
   isDraw() {
-    var game = this.getGame();
-    return game.stage == 5; // draw
+    return this.getGame().stage == 5; // draw
   }
 
   isFoldAvailable() {
-    var game = this.getGame();
-    return this.getPlayerBet() == 0;
+    return this.getPlayerBet(this.getGame().player) == 0;
   }
 
   isGameOver() {
-    var game = this.getGame();
-    return game.stage == 8; // gameover
+    return this.getGame().stage == 8; // gameover
   }
 
   isRaiseAvailable() {
-    var game = this.getGame();
-    return this.getPlayerBet() > 0 && (
-           game.aiPlayer.lastBetType == 0 || // no previous bet
-           game.aiPlayer.lastBetType == 4); // raise
+    return this.getPlayerBet(this.getGame().player) > 0 && (
+           this.getGame().aiPlayer.lastBetType == 0 || // no previous bet
+           this.getGame().aiPlayer.lastBetType == 4); // raise
   }
 
   isShowdown() {
-    var game = this.getGame();
-    return game.stage == 7; // showdown
+    return this.getGame().stage == 7; // showdown
+  }
+
+  nextSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);      
+  }
+
+  raiseSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);      
   }
 
   removeChipClick(value: number) {
@@ -421,10 +392,16 @@ export class CardTable {
     };
 
     this.http.post("http://localhost:5174/game/chip/remove", request).subscribe({
-      next: value => this.apiCallSuccess(value, false),
+      next: response => this.removeChipSuccess(response),
       error: err => this.apiCallError(err),
       complete: () => {}
     });
+  }
+
+  removeChipSuccess(response: any) {
+    this.showAllCards(response);
+    this.showAllChips(response);
+    this.saveGame(response);
   }
 
   renderAlert(message: any) {
@@ -435,7 +412,6 @@ export class CardTable {
     this.clearAlert();
 
     this.alertMessage = message;
-    this.alertTimerRunning = true;
 
     this.alertInterval = setInterval(() => {
       this.alertVisible = !this.alertVisible;
@@ -473,7 +449,6 @@ export class CardTable {
           renderAIPlayer = true;
         }
         else {
-
           game.player.chips[index++].visible = true;
           this.saveGame(game);
         }
@@ -481,6 +456,7 @@ export class CardTable {
       else {
         if (index >= anteUpChips.length) {
           clearInterval(this.renderAnteUpInterval);
+          this.renderAnteUpInterval = 0;
           game.player.chips = [];
           game.aiPlayer.chips = [];
           game.pot = pot;
@@ -494,14 +470,14 @@ export class CardTable {
     }, 1000);
   }
 
-  renderPlayerHand() {
+  renderDeal() {
 
     var game = this.getGame();
 
     var index = 0;
     var reveal = false;
 
-    this.renderPlayerHandInterval = setInterval(() => {
+    this.renderDealInterval = setInterval(() => {
 
       if (!reveal) {
         if (index >= game.player.cards.length) {
@@ -515,7 +491,8 @@ export class CardTable {
       }
       else {
         if (index < 0) {
-          clearInterval(this.renderPlayerHandInterval);
+          clearInterval(this.renderDealInterval);
+          this.renderDealInterval = 0;
         }
         else {
           game.player.cards[index--].reveal = true;
@@ -527,5 +504,57 @@ export class CardTable {
 
   saveGame(game: any) {
     localStorage.setItem("game", JSON.stringify(game));
+  }
+
+  showAllCards(game: any) {
+    
+    var cards = game.player.cards as any[];
+
+    cards.forEach(x => {
+      x.reveal = true;
+      x.visible = true;
+    });
+  }
+
+  showAllChips(game: any) {
+
+    var chips = game.player.chips as any[];
+
+    chips.forEach(x => {
+      x.visible = true;
+    });
+  }
+
+  showdownSuccess(response: any) {
+    this.showAllCards(response);
+    this.saveGame(response);
+    this.renderAlert(response.alert);      
+  }
+
+  validateAddChip(value: number) {
+
+    var game = this.getGame();
+
+    // chips can only be added during pre draw and post draw betting
+
+    if (game.stage != 4 && game.stage != 6)
+      return false;
+
+    // chips can only be added up to the game limit
+
+    if (this.getPlayerBet(this.getGame().player) + value > this.getGame().limit)
+      return false;
+
+    // chips can only be added up to available cash
+
+    if (value > this.getGame().player.cash)
+      return false;
+
+    return true;
+  }
+
+  validateHold() {
+    // cards can only be held during draw
+    return this.getGame().stage == 5;
   }
 }

@@ -18,9 +18,9 @@
             <h5>{{ getGame().hand.toString().padStart(3, '0') }}</h5>
         </div>
         <div class="card-table-sub-header-centre">
-            <h5 *ngIf="!alertTimerRunning">{{ getGame().subTitle }}</h5>
-            <h5 *ngIf="alertTimerRunning && alertVisible">{{ alertMessage }}</h5>
-            <br *ngIf="alertTimerRunning && !alertVisible" />
+            <h5 *ngIf="alertInterval == 0">{{ getGame().subTitle }}</h5>
+            <h5 *ngIf="alertInterval > 0 && alertVisible">{{ alertMessage }}</h5>
+            <br *ngIf="alertInterval > 0 && !alertVisible" />
         </div>
         <div class="card-table-sub-header-right">
             <h5>${{ getGame().pot }}</h5>
@@ -88,7 +88,7 @@
 
     <div class="card-table-sub-footer">
         <div class="card-table-sub-footer-left">
-            <h5 *ngIf="isAnte()">${{ getAIPlayerBet() }}</h5>
+            <h5 *ngIf="isAnte() || renderAnteUpInterval > 0">${{ getPlayerBet(getGame().aiPlayer) }}</h5>
             <h5 *ngIf="isBet()">${{ getGame().aiPlayer.lastBetAmount }} <span>{{ getBetType(getGame().aiPlayer.lastBetType) }}</span></h5>
             <h4 *ngIf="isGameOver()">{{ getGame().aiPlayer.hand }}</h4>
             <br *ngIf="!isBet() && !isGameOver()" />
@@ -114,7 +114,7 @@
             </div>
         </div>
         <div class="card-table-sub-footer-right">
-            <h5 *ngIf="isAnte() || isBet()">${{ getPlayerBet() }}</h5>
+            <h5 *ngIf="isAnte() || isBet() || renderAnteUpInterval > 0">${{ getPlayerBet(getGame().player) }}</h5>
             <h4 *ngIf="isGameOver()">{{ getGame().player.hand }}</h4>
             <br *ngIf="!isBet() && !isGameOver()" />
         </div>
