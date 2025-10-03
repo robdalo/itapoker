@@ -46,6 +46,10 @@ export class CardTable {
     this.saveGame(response);
   }
 
+  alertMessageVisible() {
+    return this.alertInterval > 0 && this.alertVisible;
+  }
+
   anteUpSuccess(response: any) {
     
     this.renderAnteUp();
@@ -296,6 +300,10 @@ export class CardTable {
     }
   }
 
+  getHand() {
+    return this.getGame().hand.toString().padStart(3, '0');
+  }
+
   getPlayerBet(player: any) {
 
     var bet = 0;
@@ -371,6 +379,14 @@ export class CardTable {
     this.renderAlert(response.alert);      
   }
 
+  playerBetVisible() {
+    return this.isAnte() || this.isBet() || this.renderAnteUpVisible();
+  }
+
+  playerWinningsVisible(player: any) {
+    return player.winnings >= 0;
+  }
+
   raiseSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
@@ -432,19 +448,15 @@ export class CardTable {
 
     this.saveGame(game);
 
-    var anteUpChips = [
-      { url: "images/chips/light-blue.png", title: "Light Blue Chip", value: 5, quantity: 1, total: 5, visible: false }
-    ];
-
-    game.player.chips = JSON.parse(JSON.stringify(anteUpChips));
-    game.aiPlayer.chips = JSON.parse(JSON.stringify(anteUpChips));
+    game.player.chips = JSON.parse(JSON.stringify(game.anteChips));
+    game.aiPlayer.chips = JSON.parse(JSON.stringify(game.anteChips));
 
     var index = 0;
     var renderAIPlayer = false;
 
     this.renderAnteUpInterval = setInterval(() => {
       if (!renderAIPlayer) {
-        if (index >= anteUpChips.length) {        
+        if (index >= game.anteChips.length) {        
           index = 0;
           renderAIPlayer = true;
         }
@@ -454,7 +466,7 @@ export class CardTable {
         }
       }
       else {
-        if (index >= anteUpChips.length) {
+        if (index >= game.anteChips.length) {
           clearInterval(this.renderAnteUpInterval);
           this.renderAnteUpInterval = 0;
           game.player.chips = [];
@@ -468,6 +480,10 @@ export class CardTable {
         }       
       }
     }, 1000);
+  }
+
+  renderAnteUpVisible() {
+    return this.renderAnteUpInterval > 0;
   }
 
   renderDeal() {
@@ -523,6 +539,10 @@ export class CardTable {
     chips.forEach(x => {
       x.visible = true;
     });
+  }
+
+  subTitleVisible() {
+    return this.alertInterval == 0;
   }
 
   showdownSuccess(response: any) {

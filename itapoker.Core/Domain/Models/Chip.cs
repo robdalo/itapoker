@@ -5,6 +5,7 @@ public class Chip
 {
     public int Quantity { get; set; }
     public int Value { get; set; }
+    public bool Visible { get; set; }
     public string Colour => GetColour();
     public string Title => $"{this.Colour} Chip - {this.Quantity}";
     public string Url => $"images/chips/{this.Colour}.png".Replace(" ", "-").ToLower();
