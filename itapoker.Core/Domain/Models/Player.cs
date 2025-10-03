@@ -16,4 +16,18 @@ public class Player
     public int LastBetAmount { get; set; }
     public List<Card> Cards { get; set; } = new();
     public List<Chip> Chips { get; set; } = new();
+    public string LastBetTypeTitle => GetBetTypeTitle(this.LastBetType);
+
+    public static string GetBetTypeTitle(BetType betType)
+    {
+        switch (betType)
+        {
+            case BetType.Call: return "Call";
+            case BetType.Check: return "Check";
+            case BetType.Fold: return "Fold";
+            case BetType.Raise: return "Raise";
+
+            default: return "";
+        }
+    }
 }

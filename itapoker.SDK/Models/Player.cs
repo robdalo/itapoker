@@ -16,4 +16,5 @@ public class Player
     public int LastBetAmount { get; set; }
     public List<Card> Cards { get; set; } = new();
     public List<Chip> Chips { get; set; } = new();
+    public string LastBetTypeTitle { get; set; }
 }

@@ -1,8 +1,9 @@
+import { ApiConsumer } from '../api-consumer';
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
+import { GameEngine } from '../game-engine';
 import { Router } from '@angular/router';
 import { Validator } from '../validator';
-import { ApiConsumer } from '../api-consumer';
 
 @Component({
   selector: 'app-card-table',
@@ -12,24 +13,32 @@ import { ApiConsumer } from '../api-consumer';
 })
 export class CardTable {
 
-  alertInterval = 0;
-  alertMessage = "";
-  alertVisible = false;
+  renderAlertSettings = {
+    message: "",
+    interval: 0,
+    visible: false
+  };
 
-  renderAnteUpInterval = 0;
-  renderDealInterval = 0;
+  renderAnteUpSettings = {
+    interval: 0
+  };
+
+  renderDealSettings = {
+    interval: 0
+  };
 
   constructor(
     private apiConsumer: ApiConsumer,
+    protected gameEngine: GameEngine,
     private router: Router,
     private validator: Validator) {
   }
 
   addChipClick(value: number) {
 
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
 
-    if (!this.validator.validateAddChip(game, this.getPlayerBet(game.player), value))
+    if (!this.validator.validateAddChip(game, this.gameEngine.getPlayerBet(game.player), value))
       return;
 
     this.apiConsumer.addChip(
@@ -42,11 +51,7 @@ export class CardTable {
   addChipSuccess(response: any) {
     this.showAllCards(response);
     this.showAllChips(response);
-    this.saveGame(response);
-  }
-
-  alertMessageVisible() {
-    return this.alertInterval > 0 && this.alertVisible;
+    this.gameEngine.saveGame(response);
   }
 
   anteUpSuccess(response: any) {
@@ -54,9 +59,9 @@ export class CardTable {
     this.renderAnteUp();
     
     var wait = setInterval(() => {
-      if (this.renderAnteUpInterval == 0) {
+      if (this.renderAnteUpSettings.interval == 0) {
         clearInterval(wait);
-        this.saveGame(response);
+        this.gameEngine.saveGame(response);
         this.renderAlert(response.alert);
       }    
     }, 500);
@@ -68,7 +73,7 @@ export class CardTable {
 
   btnAnteClick() {
     this.apiConsumer.anteUp(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.anteUpSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -76,7 +81,7 @@ export class CardTable {
 
   btnCallClick() {
     this.apiConsumer.call(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.callSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -84,7 +89,7 @@ export class CardTable {
 
   btnCheckClick() {
     this.apiConsumer.check(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.checkSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -92,14 +97,14 @@ export class CardTable {
 
   btnDealClick() {
     this.apiConsumer.deal(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.dealSuccess.bind(this),
       this.apiCallError.bind(this)
     );
   }
 
   btnDrawClick() {
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
     var cards = game.player.cards as any[];
 
     this.apiConsumer.draw(
@@ -112,7 +117,7 @@ export class CardTable {
 
   btnFoldClick() {
     this.apiConsumer.fold(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.foldSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -120,7 +125,7 @@ export class CardTable {
 
   btnNextClick() {
     this.apiConsumer.next(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.nextSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -128,8 +133,8 @@ export class CardTable {
 
   btnRaiseClick() {
     this.apiConsumer.raise(
-      this.getGame().gameId,
-      this.getPlayerBet(this.getGame().player),
+      this.gameEngine.getGame().gameId,
+      this.gameEngine.getPlayerBet(this.gameEngine.getGame().player),
       this.raiseSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -141,7 +146,7 @@ export class CardTable {
 
   btnShowdownClick() {
     this.apiConsumer.showdown(
-      this.getGame().gameId,
+      this.gameEngine.getGame().gameId,
       this.showdownSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -149,19 +154,19 @@ export class CardTable {
 
   callSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);
   }
 
   checkSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);    
   }
 
   cardClick(rank: number, suit: number) {
 
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
 
     if (!this.validator.validateHold(game))
       return;
@@ -177,22 +182,22 @@ export class CardTable {
 
   cardClickSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
   }
 
   clearAlert() {
-      clearInterval(this.alertInterval);
-      this.alertInterval = 0;
-      this.alertVisible = false;
-      this.alertMessage = "";
+      clearInterval(this.renderAlertSettings.interval);
+      this.renderAlertSettings.interval = 0;
+      this.renderAlertSettings.message = "";
+      this.renderAlertSettings.visible = false;      
   }
 
   dealSuccess(response: any) {
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderDeal();
 
     var wait = setInterval(() => {
-      if (this.renderDealInterval == 0) {
+      if (this.renderDealSettings.interval == 0) {
         clearInterval(wait);
         this.renderAlert(response.alert);
       }    
@@ -201,32 +206,19 @@ export class CardTable {
 
   drawSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);
   }
 
   foldSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);      
-  }
-
-  getBetType(betType: number) {
-
-    switch(betType) {
-
-      case 1: return "Call";
-      case 2: return "Check";
-      case 3: return "Fold";
-      case 4: return "Raise";
-
-      default: return "";
-    }
   }
 
   getCardUrl(index: number) {
 
-    var card = this.getGame().player.cards[index];
+    var card = this.gameEngine.getGame().player.cards[index];
     
     if (!card.reveal)
       return "images/cards/back.png";
@@ -234,124 +226,26 @@ export class CardTable {
     return card.url;
   }
 
-  getGame() {
-    var json = localStorage.getItem("game");
-    return json ? JSON.parse(json) : null;
-  }
-
-  getGameStage(stage: number) {
-
-    switch (stage) {
-
-      case 1: return "NewGame";
-      case 2: return "Ante";
-      case 3: return "Deal";
-      case 4: return "BetPreDraw";
-      case 5: return "Draw";
-      case 6: return "BetPostDraw";
-      case 7: return "Showdown";
-      case 8: return "GameOver";
-
-      default: return "";
-    }
-  }
-
-  getHand() {
-    return this.getGame().hand.toString().padStart(3, '0');
-  }
-
-  getPlayerBet(player: any) {
-
-    var bet = 0;
-    var chips = player.chips as any[];
-
-    chips.filter(x => x.visible).forEach(x => {
-      bet += x.total;
-    });
-
-    return bet;
-  }
-
-  isAIPlayerHandVisible() {
-    return false;
-  }
-
-  isAIPlayerLastBetVisible() {
-    return this.getGame().stage != 8; // game over
-  }
-
-  isAnte() {
-    return this.getGame().stage == 2; // ante up
-  }
-
-  isBet() {
-    return this.getGame().stage == 4 || 
-           this.getGame().stage == 6; // bet pre draw / bet post draw
-  }
-
-  isCallAvailable() {
-    return this.getGame().aiPlayer.lastBetType == 4 && // raise
-           this.getPlayerBet(this.getGame().player) == 0;
-  }
-
-  isCardsDealt() {
-    return this.getGame().stage > 3; // deal
-  }
-
-  isCheckAvailable() {
-    return this.getPlayerBet(this.getGame().player) == 0 &&
-           this.getGame().aiPlayer.lastBetType == 0; // no previous bet
-  }
-
-  isDeal() {
-    return this.getGame().stage == 3; // deal
-  }
-
-  isDraw() {
-    return this.getGame().stage == 5; // draw
-  }
-
-  isFoldAvailable() {
-    return this.getPlayerBet(this.getGame().player) == 0;
-  }
-
-  isGameOver() {
-    return this.getGame().stage == 8; // gameover
-  }
-
-  isRaiseAvailable() {
-    return this.getPlayerBet(this.getGame().player) > 0 && (
-           this.getGame().aiPlayer.lastBetType == 0 || // no previous bet
-           this.getGame().aiPlayer.lastBetType == 4); // raise
-  }
-
-  isShowdown() {
-    return this.getGame().stage == 7; // showdown
-  }
-
   nextSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);      
   }
 
-  playerBetVisible() {
-    return this.isAnte() || this.isBet() || this.renderAnteUpVisible();
-  }
-
-  playerWinningsVisible(player: any) {
-    return player.winnings >= 0;
+  playerBetEnabled() {
+    return this.gameEngine.playerBetEnabled(this.gameEngine.getGame()) || 
+           this.renderAnteUpVisible();
   }
 
   raiseSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);      
   }
 
   removeChipClick(value: number) {
 
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
 
     if (!this.validator.validateRemoveChip(game))
       return;
@@ -367,7 +261,7 @@ export class CardTable {
   removeChipSuccess(response: any) {
     this.showAllCards(response);
     this.showAllChips(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
   }
 
   renderAlert(message: any) {
@@ -377,10 +271,10 @@ export class CardTable {
 
     this.clearAlert();
 
-    this.alertMessage = message;
+    this.renderAlertSettings.message = message;
 
-    this.alertInterval = setInterval(() => {
-      this.alertVisible = !this.alertVisible;
+    this.renderAlertSettings.interval = setInterval(() => {
+      this.renderAlertSettings.visible = !this.renderAlertSettings.visible;
     }, 1000);
 
     setTimeout(() => {
@@ -388,15 +282,19 @@ export class CardTable {
     }, 10000);
   }
 
+  renderAlertVisible() {
+    return this.renderAlertSettings.interval > 0 && this.renderAlertSettings.visible;
+  }  
+
   renderAnteUp() {
 
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
 
     var pot = game.pot;
 
     game.pot = 0;
 
-    this.saveGame(game);
+    this.gameEngine.saveGame(game);
 
     game.player.chips = JSON.parse(JSON.stringify(game.anteChips));
     game.aiPlayer.chips = JSON.parse(JSON.stringify(game.anteChips));
@@ -404,7 +302,7 @@ export class CardTable {
     var index = 0;
     var renderAIPlayer = false;
 
-    this.renderAnteUpInterval = setInterval(() => {
+    this.renderAnteUpSettings.interval = setInterval(() => {
       if (!renderAIPlayer) {
         if (index >= game.anteChips.length) {        
           index = 0;
@@ -412,38 +310,38 @@ export class CardTable {
         }
         else {
           game.player.chips[index++].visible = true;
-          this.saveGame(game);
+          this.gameEngine.saveGame(game);
         }
       }
       else {
         if (index >= game.anteChips.length) {
-          clearInterval(this.renderAnteUpInterval);
-          this.renderAnteUpInterval = 0;
+          clearInterval(this.renderAnteUpSettings.interval);
+          this.renderAnteUpSettings.interval = 0;
           game.player.chips = [];
           game.aiPlayer.chips = [];
           game.pot = pot;
-          this.saveGame(game);
+          this.gameEngine.saveGame(game);
         }
         else {
           game.aiPlayer.chips[index++].visible = true;
-          this.saveGame(game);
+          this.gameEngine.saveGame(game);
         }       
       }
     }, 1000);
   }
 
   renderAnteUpVisible() {
-    return this.renderAnteUpInterval > 0;
+    return this.renderAnteUpSettings.interval > 0;
   }
 
   renderDeal() {
 
-    var game = this.getGame();
+    var game = this.gameEngine.getGame();
 
     var index = 0;
     var reveal = false;
 
-    this.renderDealInterval = setInterval(() => {
+    this.renderDealSettings.interval = setInterval(() => {
 
       if (!reveal) {
         if (index >= game.player.cards.length) {
@@ -452,24 +350,20 @@ export class CardTable {
         }
         else {
           game.player.cards[index++].visible = true;
-          this.saveGame(game);
+          this.gameEngine.saveGame(game);
         }
       }
       else {
         if (index < 0) {
-          clearInterval(this.renderDealInterval);
-          this.renderDealInterval = 0;
+          clearInterval(this.renderDealSettings.interval);
+          this.renderDealSettings.interval = 0;
         }
         else {
           game.player.cards[index--].reveal = true;
-          this.saveGame(game);
+          this.gameEngine.saveGame(game);
         }
       }
     }, 500);
-  }
-
-  saveGame(game: any) {
-    localStorage.setItem("game", JSON.stringify(game));
   }
 
   showAllCards(game: any) {
@@ -492,12 +386,12 @@ export class CardTable {
   }
 
   subTitleVisible() {
-    return this.alertInterval == 0;
+    return this.renderAlertSettings.interval == 0;
   }
 
   showdownSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
+    this.gameEngine.saveGame(response);
     this.renderAlert(response.alert);      
   }
 }
