@@ -55,6 +55,14 @@ export class GameEngine {
     return game.stage == 8;
   }
 
+  getCardUrl(card: any) {
+
+    if (!card.reveal)
+      return "images/cards/back.png";
+
+    return card.url;
+  }
+
   getGame() {
     var json = localStorage.getItem("game");
     return json ? JSON.parse(json) : null;
