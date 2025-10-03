@@ -217,11 +217,6 @@ export class CardTable {
     this.renderAlert(response.alert);
   }
 
-  playerBetEnabled() {
-    return this.gameEngine.playerBetEnabled(this.game) || 
-           this.renderAnteUpEnabled();
-  }
-
   raiseSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
@@ -360,13 +355,13 @@ export class CardTable {
     });
   }
 
-  subTitleEnabled() {
-    return this.renderAlertSettings.interval == 0;
-  }
-
   showdownSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
-    this.renderAlert(response.alert);      
+    this.renderAlert(response.alert);
   }
+
+  subTitleEnabled() {
+    return this.renderAlertSettings.interval == 0;
+  }  
 }
