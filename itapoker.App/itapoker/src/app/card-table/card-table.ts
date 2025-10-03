@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Validator } from '../validator';
+import { ApiConsumer } from '../api-consumer';
 
 @Component({
   selector: 'app-card-table',
@@ -19,25 +20,23 @@ export class CardTable {
   renderDealInterval = 0;
 
   constructor(
-    private http: HttpClient,
-    private router: Router) {
+    private apiConsumer: ApiConsumer,
+    private router: Router,
+    private validator: Validator) {
   }
 
   addChipClick(value: number) {
 
-    if (!this.validateAddChip(value))
+    var game = this.getGame();
+
+    if (!this.validator.validateAddChip(game, this.getPlayerBet(game.player), value))
       return;
 
-    var request = {
-      GameId: this.getGame().gameId,
-      Value: value
-    };
-
-    this.http.post("http://localhost:5174/game/chip/add", request).subscribe({
-      next: response => this.addChipSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.addChip(
+      game.gameId, 
+      value, 
+      this.addChipSuccess.bind(this), 
+      this.apiCallError.bind(this));
   }
 
   addChipSuccess(response: any) {
@@ -68,109 +67,72 @@ export class CardTable {
   }
 
   btnAnteClick() {
-    var request = {
-      GameId: this.getGame().gameId
-    };
-
-    this.http.post("http://localhost:5174/game/anteup", request).subscribe({
-      next: value => this.anteUpSuccess(value),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.anteUp(
+      this.getGame().gameId,
+      this.anteUpSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnCallClick() {
-    var request = {
-      GameId: this.getGame().gameId,
-      BetType: 1 // call
-    };
-
-    this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: response => this.callSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.call(
+      this.getGame().gameId,
+      this.callSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnCheckClick() {
-    var request = {
-      GameId: this.getGame().gameId,
-      BetType: 2 // check
-    };
-
-    this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: response => this.checkSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.check(
+      this.getGame().gameId,
+      this.checkSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnDealClick() {
-    var request = {
-      GameId: this.getGame().gameId
-    };
-
-    this.http.post("http://localhost:5174/game/deal", request).subscribe({
-      next: response => this.dealSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.deal(
+      this.getGame().gameId,
+      this.dealSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnDrawClick() {
-
     var game = this.getGame();
     var cards = game.player.cards as any[];
 
-    var request = {
-      GameId: game.gameId,
-      Cards: cards.filter(item => !item.hold)
-    };
-
-    this.http.post("http://localhost:5174/game/draw", request).subscribe({
-      next: response => this.drawSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.draw(
+      game.gameId,
+      cards.filter(item => !item.hold),
+      this.drawSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnFoldClick() {
-    var request = {
-      GameId: this.getGame().gameId,
-      BetType: 3 // fold
-    };
-
-    this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: response => this.foldSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.fold(
+      this.getGame().gameId,
+      this.foldSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnNextClick() {
-    var request = {
-      GameId: this.getGame().gameId
-    };
-
-    this.http.post("http://localhost:5174/game/next", request).subscribe({
-      next: response => this.nextSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.next(
+      this.getGame().gameId,
+      this.nextSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnRaiseClick() {
-    var request = {
-      GameId: this.getGame().gameId,
-      BetType: 4, // raise
-      Amount: this.getPlayerBet(this.getGame().player)
-    };
-
-    this.http.post("http://localhost:5174/game/bet", request).subscribe({
-      next: response => this.raiseSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.raise(
+      this.getGame().gameId,
+      this.getPlayerBet(this.getGame().player),
+      this.raiseSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   btnRetireClick() {
@@ -178,15 +140,11 @@ export class CardTable {
   }
 
   btnShowdownClick() {
-    var request = {
-      GameId: this.getGame().gameId
-    };
-
-    this.http.post("http://localhost:5174/game/showdown", request).subscribe({
-      next: response => this.showdownSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.showdown(
+      this.getGame().gameId,
+      this.showdownSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   callSuccess(response: any) {
@@ -203,20 +161,18 @@ export class CardTable {
 
   cardClick(rank: number, suit: number) {
 
-    if (!this.validateHold())
+    var game = this.getGame();
+
+    if (!this.validator.validateHold(game))
       return;
 
-    var request = {
-      GameId: this.getGame().gameId,
-      Rank: rank,
-      Suit: suit
-    };
-
-    this.http.post("http://localhost:5174/game/hold", request).subscribe({
-      next: response => this.cardClickSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.hold(
+      game.gameId,
+      rank,
+      suit,
+      this.cardClickSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   cardClickSuccess(response: any) {
@@ -253,7 +209,7 @@ export class CardTable {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);      
-  }  
+  }
 
   getBetType(betType: number) {
 
@@ -397,21 +353,15 @@ export class CardTable {
 
     var game = this.getGame();
 
-    // chips can only be removed during pre draw and post draw betting
-    
-    if (game.stage != 4 && game.stage != 6)
+    if (!this.validator.validateRemoveChip(game))
       return;
 
-    var request = {
-      GameId: game.gameId,
-      Value: value
-    };
-
-    this.http.post("http://localhost:5174/game/chip/remove", request).subscribe({
-      next: response => this.removeChipSuccess(response),
-      error: err => this.apiCallError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.removeChip(
+      game.gameId,
+      value,
+      this.removeChipSuccess.bind(this),
+      this.apiCallError.bind(this)
+    );
   }
 
   removeChipSuccess(response: any) {
@@ -549,32 +499,5 @@ export class CardTable {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);      
-  }
-
-  validateAddChip(value: number) {
-
-    var game = this.getGame();
-
-    // chips can only be added during pre draw and post draw betting
-
-    if (game.stage != 4 && game.stage != 6)
-      return false;
-
-    // chips can only be added up to the game limit
-
-    if (this.getPlayerBet(this.getGame().player) + value > this.getGame().limit)
-      return false;
-
-    // chips can only be added up to available cash
-
-    if (value > this.getGame().player.cash)
-      return false;
-
-    return true;
-  }
-
-  validateHold() {
-    // cards can only be held during draw
-    return this.getGame().stage == 5;
   }
 }
