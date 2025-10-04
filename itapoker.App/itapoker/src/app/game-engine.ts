@@ -92,6 +92,13 @@ export class GameEngine {
     return game.stage > 3;
   }
 
+  playerLastBetEnabled(game: any) {
+    // player last bet is only enabled when game stage is showdown
+    // and player has folded
+    return game.stage == 8 &&
+           game.player.lastBetType == 3;
+  }
+
   playerWinningsEnabled(player: any) {
     // player winnings is only enabled when player winnings 
     // is greater than zero

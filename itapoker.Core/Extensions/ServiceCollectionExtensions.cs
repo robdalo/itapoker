@@ -1,3 +1,4 @@
+using itapoker.Core.Domain.Models;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories;
 using itapoker.Core.Repositories.Interfaces;
@@ -17,9 +18,12 @@ public static class ServiceCollectionExtensions
             cfg.LicenseKey = "";
         });
 
+        services.AddOptions<GameSettings>();
+
         services.AddSingleton<IGameRepo, GameRepo>();
         services.AddSingleton<IHighScoreRepo, HighScoreRepo>();
 
+        services.AddSingleton<IBetService, BetService>();
         services.AddSingleton<ICardService, CardService>();
         services.AddSingleton<IDecisionService, DecisionService>();
         services.AddSingleton<ISecurityService, SecurityService>();

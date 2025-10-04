@@ -316,6 +316,10 @@ export class CardTable {
     return this.gameEngine.playerHandEnabled(this.game);
   }
 
+  playerLastBetEnabled() {
+    return this.gameEngine.playerLastBetEnabled(this.game);
+  }
+
   playerWinningsEnabled() {
     return this.gameEngine.playerWinningsEnabled(this.game.player);
   }

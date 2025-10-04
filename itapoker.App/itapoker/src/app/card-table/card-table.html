@@ -95,6 +95,7 @@
         </div>
         <div class="card-table-sub-footer-right">
             <h5 *ngIf="playerBetEnabled()">${{ getPlayerBet() }}</h5>
+            <h5 *ngIf="playerLastBetEnabled()">${{ game.player.lastBetAmount }} <span>{{ game.player.lastBetTypeTitle }}</span></h5>
             <h4 *ngIf="gameOverEnabled()">{{ game.player.hand }}</h4>
             <br *ngIf="!playerBetEnabled() && !gameOverEnabled()" />
         </div>

@@ -4,21 +4,23 @@ using itapoker.Core.Domain.Requests;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
 using itapoker.Core.Services.Interfaces;
-using itapoker.Shared.Consumers;
 
 namespace itapoker.Core;
 
 public class GameEngine : IGameEngine
 {
+    private readonly IBetService _betService;
     private readonly ICardService _cardService;
     private readonly IDecisionService _decisionService;
     private readonly IGameRepo _gameRepo;
 
     public GameEngine(
+        IBetService betService,
         ICardService cardService,
         IDecisionService decisionService,
         IGameRepo gameRepo)
     {
+        _betService = betService;
         _cardService = cardService;
         _decisionService = decisionService;
         _gameRepo = gameRepo;
@@ -77,126 +79,16 @@ public class GameEngine : IGameEngine
 
         // process the player bet first, then the ai player bet
 
-        if (request.BetType == BetType.Fold)
-        {
-            // if the player is folding, we should end the game
-            // immediately and pay out the ai player
-
-            game.Player.LastBetAmount = 0;
-            game.Player.LastBetType = BetType.Fold;
-            game.Player.LastBetChips = new();
-
-            game.AIPlayer.Cash += game.Pot;
-
-            game.Pot = 0;
-            game.Stage = GameStage.GameOver;
-        }
-        else if (request.BetType == BetType.Check)
-        {
-            // if the player is checking, the pot remains
-            // unchanged and we pass control to the ai player
-
-            game.Player.LastBetAmount = 0;
-            game.Player.LastBetType = BetType.Check;
-            game.Player.LastBetChips = new();
-        }
-        else if (request.BetType == BetType.Call)
-        {
-            // if the player is calling, they are matching
-            // the ai players bet and asking to proceed to the draw
-
-            game.Player.LastBetAmount = game.AIPlayer.LastBetAmount;
-            game.Player.LastBetType = BetType.Call;
-            game.Player.LastBetChips = new();
-
-            game.Player.Cash -= game.Player.LastBetAmount;
-
-            game.Pot += game.Player.LastBetAmount;
-
-            game.Stage = GetNextGameStage(game.Stage);
-        }
-        else if (request.BetType == BetType.Raise)
-        {
-            // if the player is raising, they are matching
-            // the previous ai player bet, but then raising the
-            // bet by an amount
-
-            game.Player.LastBetAmount = request.Amount;
-            game.Player.LastBetType = BetType.Raise;
-            game.Player.LastBetChips = Serializer.Clone(game.Player.Chips);
-
-            game.Player.Cash -= game.AIPlayer.LastBetAmount;
-            game.Player.Cash -= request.Amount;
-
-            game.Pot += game.AIPlayer.LastBetAmount;
-            game.Pot += request.Amount;
-        }
+        game = _betService.ProcessPlayerBet(
+            game: game,
+            betType: request.BetType,
+            amount: request.Amount);
 
         // if the player is folding or calling, we don't need
         // to process the ai player bet
 
-        if (request.BetType == BetType.Fold || request.BetType == BetType.Call)
-            return _gameRepo.AddOrUpdate(game);
-
-        // process the ai player bet
-
-        // we need to implement some ai logic that will
-        // determine the ai players decision regarding which
-        // type of bet to make - this will reside in decisionService
-
-        var (betType, amount) = GetBet(game);
-
-        if (betType == BetType.Fold)
-        {
-            // if the ai player is folding, we should end the game
-            // immediately and pay out the player
-
-            game.AIPlayer.LastBetAmount = 0;
-            game.AIPlayer.LastBetType = BetType.Fold;
-
-            game.Player.Cash += game.Pot;
-
-            game.Pot = 0;
-            game.Stage = GameStage.GameOver;
-        }
-        else if (betType == BetType.Check)
-        {
-            // if the ai player is checking, the pot remains
-            // unchanged, the betting round ends and we proceed
-            // to the draw
-
-            game.AIPlayer.LastBetAmount = 0;
-            game.AIPlayer.LastBetType = BetType.Check;
-
-            game.Stage = GetNextGameStage(game.Stage);
-        }
-        else if (betType == BetType.Call)
-        {
-            // if the ai player is calling, they are matching
-            // the player bet and asking to proceed to the draw
-
-            game.AIPlayer.LastBetAmount = game.Player.LastBetAmount;
-            game.AIPlayer.LastBetType = BetType.Call;
-            game.AIPlayer.Cash -= game.AIPlayer.LastBetAmount;
-
-            game.Pot += game.AIPlayer.LastBetAmount;
-
-            game.Stage = GetNextGameStage(game.Stage);
-        }
-        else if (betType == BetType.Raise)
-        {
-            // if the ai player is raising, they are matching
-            // the previous player bet, but then raising the
-            // bet by an amount
-
-            game.AIPlayer.LastBetAmount = amount;
-            game.AIPlayer.LastBetType = BetType.Raise;
-            game.AIPlayer.Cash -= game.Player.LastBetAmount;
-            game.AIPlayer.Cash -= amount;
-
-            game.Pot += game.Player.LastBetAmount;
-            game.Pot += amount;
-        }
+        if (request.BetType != BetType.Fold && request.BetType != BetType.Call)
+            game = _betService.ProcessAIPlayerBet(game);
 
         game.Player.Chips.Clear();
         game.AIPlayer.Chips.Clear();
@@ -421,15 +313,11 @@ public class GameEngine : IGameEngine
         if (playerHandType > aiHandType)
         {
             game.Player.Cash += game.Pot;
-            game.Player.Winnings += game.Pot / 2;
-            game.AIPlayer.Winnings -= game.Pot / 2;
             game.Alert = $"Pay {game.Player.Name}";
         }
         else if (aiHandType > playerHandType)
         {
             game.AIPlayer.Cash += game.Pot;
-            game.AIPlayer.Winnings += game.Pot / 2;
-            game.Player.Winnings -= game.Pot / 2;
             game.Alert = $"Pay AI player";
         }
         else
@@ -439,6 +327,8 @@ public class GameEngine : IGameEngine
             game.Alert = $"Return all bets";
         }
 
+        game.Player.Winnings = game.Player.Cash - game.Cash;
+        game.AIPlayer.Winnings =  game.AIPlayer.Cash - game.Cash;
         game.Player.Hand = _cardService.GetHandTitle(playerHandType);
         game.AIPlayer.Hand = _cardService.GetHandTitle(aiHandType);
         game.Pot = 0;
@@ -480,33 +370,6 @@ public class GameEngine : IGameEngine
         };
 
         return _gameRepo.AddOrUpdate(game);
-    }
-
-    private (BetType, int) GetBet(Game game)
-    {
-        if (game.NextBetType.HasValue && game.NextBetAmount.HasValue)
-        {
-            var betType = game.NextBetType.Value;
-            var betAmount = game.NextBetAmount.Value;
-
-            game.NextBetType = null;
-            game.NextBetAmount = null;
-
-            return (betType, betAmount);
-        }
-
-        return _decisionService.GetBet(game);
-    }
-
-    private GameStage GetNextGameStage(GameStage stage)
-    {
-        // if we are in the 1st round of betting, the next stage
-        // is the draw. if we are in the 2nd round of betting, the
-        // next stage is the showdown
-
-        return stage == GameStage.BetPreDraw ?
-            GameStage.Draw :
-            GameStage.Showdown;
     }
 
     private string GetSubTitle(GameStage stage)

@@ -12,6 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="itapoker.Core.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\itapoker.SDK\itapoker.SDK.csproj" />
   </ItemGroup>
 </Project>
