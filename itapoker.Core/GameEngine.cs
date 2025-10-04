@@ -90,6 +90,14 @@ public class GameEngine : IGameEngine
         if (request.BetType != BetType.Fold && request.BetType != BetType.Call)
             game = _betService.ProcessAIPlayerBet(game);
 
+        if (game.Player.LastBetType == BetType.Fold || game.AIPlayer.LastBetType == BetType.Fold)
+        {
+            game.Player.Cards.Clear();
+            game.AIPlayer.Cards.Clear();
+            game.Player.Hand = "";
+            game.AIPlayer.Hand = "";
+        }
+
         game.Player.Chips.Clear();
         game.AIPlayer.Chips.Clear();
 

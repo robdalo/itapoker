@@ -60,7 +60,17 @@
             </div>
         </div>
         <div class="card-table-player-hand" *ngIf="playerHandEnabled()">
-            <div class="end"><br /></div>
+            <div class="end">
+                <br *ngIf="!ui.render.bet.enabled()" />
+                <div *ngIf="ui.render.bet.enabled()" class="card-table-bets">
+                    <div *ngFor="let chip of game.aiPlayer.chips; let i = index">
+                        <div *ngIf="chip.visible">
+                            <img [src]="chip.url" [alt]="chip.title" />
+                            <span>{{ chip.quantity }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div *ngFor="let card of game.player.cards; let i = index" class="card">
                 <img *ngIf="card.visible" src="{{ getCardUrl(card) }}" alt="{{ card.title }}" (click)="cardClick(card.rank, card.suit)" />
                 <span *ngIf="card.hold">HOLD</span>

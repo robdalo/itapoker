@@ -120,6 +120,7 @@ export class CardTable {
 
   btnCallClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.call(
       this.game.gameId,
       this.callSuccess.bind(this),
@@ -129,6 +130,7 @@ export class CardTable {
 
   btnCheckClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.check(
       this.game.gameId,
       this.checkSuccess.bind(this),
@@ -147,11 +149,11 @@ export class CardTable {
   }
 
   btnDrawClick() {
-    var cards = this.game.player.cards as any[];
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.draw(
       this.game.gameId,
-      cards.filter(item => !item.hold),
+      (this.game.player.cards as any[]).filter(item => !item.hold),
       this.drawSuccess.bind(this),
       this.apiCallError.bind(this)
     );
@@ -159,6 +161,7 @@ export class CardTable {
 
   btnFoldClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.fold(
       this.game.gameId,
       this.foldSuccess.bind(this),
@@ -168,6 +171,7 @@ export class CardTable {
 
   btnNextClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.next(
       this.game.gameId,
       this.nextSuccess.bind(this),
@@ -177,6 +181,7 @@ export class CardTable {
 
   btnRaiseClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.raise(
       this.game.gameId,
       this.gameEngine.getPlayerBet(this.game.player),
@@ -191,6 +196,7 @@ export class CardTable {
 
   btnShowdownClick() {
     this.clearAlert();
+    this.lockUI();
     this.apiConsumer.showdown(
       this.game.gameId,
       this.showdownSuccess.bind(this),
@@ -206,6 +212,7 @@ export class CardTable {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);
+    this.unlockUI();
   }
 
   cardClick(rank: number, suit: number) {
@@ -233,8 +240,15 @@ export class CardTable {
 
   checkSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
-    this.renderAlert(response.alert);    
+    this.renderBet(response);
+    var wait = setInterval(() => {
+      if (this.ui.render.bet.interval == 0) {
+        clearInterval(wait);
+        this.saveGame(response);
+        this.renderAlert(response.alert);
+        this.unlockUI();
+      }    
+    }, 500);
   }  
 
   clearAlert() {
@@ -268,6 +282,7 @@ export class CardTable {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);
+    this.unlockUI();
   }
 
   foldEnabled() {
@@ -276,7 +291,8 @@ export class CardTable {
 
   foldSuccess(response: any) {
     this.saveGame(response);
-    this.renderAlert(response.alert);      
+    this.renderAlert(response.alert);
+    this.unlockUI();
   }
 
   gameOverEnabled() {
@@ -306,6 +322,7 @@ export class CardTable {
   nextSuccess(response: any) {
     this.saveGame(response);
     this.renderAlert(response.alert);
+    this.unlockUI();
   }
 
   playerBetEnabled() {
@@ -330,8 +347,15 @@ export class CardTable {
 
   raiseSuccess(response: any) {
     this.showAllCards(response);
-    this.saveGame(response);
-    this.renderAlert(response.alert);      
+    this.renderBet(response);
+    var wait = setInterval(() => {
+      if (this.ui.render.bet.interval == 0) {
+        clearInterval(wait);
+        this.saveGame(response);
+        this.renderAlert(response.alert);
+        this.unlockUI();
+      }    
+    }, 500);
   }
 
   removeChipClick(value: number) {
@@ -370,11 +394,7 @@ export class CardTable {
   }
 
   renderAnteUp() {
-    var pot = this.game.pot;
-
-    this.game.pot = 0;
-    this.saveGame(this.game);
-
+    
     this.game.player.chips = JSON.parse(JSON.stringify(this.game.anteChips));
     this.game.aiPlayer.chips = JSON.parse(JSON.stringify(this.game.anteChips));
 
@@ -389,7 +409,6 @@ export class CardTable {
         }
         else {
           this.game.player.chips[index++].visible = true;
-          this.saveGame(this.game);
         }
       }
       else {
@@ -398,13 +417,27 @@ export class CardTable {
           this.ui.render.anteUp.interval = 0;
           this.game.player.chips = [];
           this.game.aiPlayer.chips = [];
-          this.game.pot = pot;
-          this.saveGame(this.game);
         }
         else {
           this.game.aiPlayer.chips[index++].visible = true;
-          this.saveGame(this.game);
         }       
+      }
+    }, 1000);
+  }
+
+  renderBet(response: any) {
+
+    this.game.aiPlayer.chips = JSON.parse(JSON.stringify(response.aiPlayer.lastBetChips));
+  
+    var index = 0;
+    
+    this.ui.render.bet.interval = setInterval(() => {
+      if (index >= this.game.aiPlayer.chips.length) {
+        clearInterval(this.ui.render.bet.interval);
+        this.ui.render.bet.interval = 0;
+      }
+      else {
+        this.game.aiPlayer.chips[index++].visible = true;
       }
     }, 1000);
   }
@@ -463,6 +496,7 @@ export class CardTable {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);
+    this.unlockUI();
   }
 
   subTitleEnabled() {

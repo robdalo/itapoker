@@ -31,6 +31,7 @@ public class BetService : IBetService
 
             game.AIPlayer.LastBetAmount = 0;
             game.AIPlayer.LastBetType = BetType.Fold;
+            game.AIPlayer.LastBetChips = new();
             game.AIPlayer.Winnings = game.AIPlayer.Cash - game.Cash;
 
             game.Player.Cash += game.Pot;
@@ -47,6 +48,7 @@ public class BetService : IBetService
 
             game.AIPlayer.LastBetAmount = 0;
             game.AIPlayer.LastBetType = BetType.Check;
+            game.AIPlayer.LastBetChips = new();
 
             game.Stage = GetNextGameStage(game.Stage);
         }
@@ -55,12 +57,14 @@ public class BetService : IBetService
             // if the ai player is calling, they are matching
             // the player bet and asking to proceed to the draw
 
-            game.AIPlayer.LastBetAmount = game.Player.LastBetAmount;
+            var total = game.Player.LastBetAmount;
+
+            game.AIPlayer.LastBetAmount = total;
             game.AIPlayer.LastBetType = BetType.Call;
-            game.AIPlayer.Cash -= game.AIPlayer.LastBetAmount;
+            game.AIPlayer.LastBetChips = GetChips(total);
+            game.AIPlayer.Cash -= total;
 
-            game.Pot += game.AIPlayer.LastBetAmount;
-
+            game.Pot += total;
             game.Stage = GetNextGameStage(game.Stage);
         }
         else if (betType == BetType.Raise)
@@ -69,13 +73,14 @@ public class BetService : IBetService
             // the previous player bet, but then raising the
             // bet by an amount
 
+            var total = amount + game.Player.LastBetAmount;
+
             game.AIPlayer.LastBetAmount = amount;
             game.AIPlayer.LastBetType = BetType.Raise;
-            game.AIPlayer.Cash -= game.Player.LastBetAmount;
-            game.AIPlayer.Cash -= amount;
+            game.AIPlayer.LastBetChips = GetChips(total);
+            game.AIPlayer.Cash -= total;
 
-            game.Pot += game.Player.LastBetAmount;
-            game.Pot += amount;
+            game.Pot += total;
         }
 
         return game;
@@ -113,14 +118,14 @@ public class BetService : IBetService
             // if the player is calling, they are matching
             // the ai players bet and asking to proceed to the draw
 
-            game.Player.LastBetAmount = game.AIPlayer.LastBetAmount;
+            var total = game.AIPlayer.LastBetAmount;
+
+            game.Player.LastBetAmount = total;
             game.Player.LastBetType = BetType.Call;
-            game.Player.LastBetChips = new();
+            game.Player.LastBetChips = GetChips(total);
+            game.Player.Cash -= total;
 
-            game.Player.Cash -= game.Player.LastBetAmount;
-
-            game.Pot += game.Player.LastBetAmount;
-
+            game.Pot += total;
             game.Stage = GetNextGameStage(game.Stage);
         }
         else if (betType == BetType.Raise)
@@ -129,15 +134,14 @@ public class BetService : IBetService
             // the previous ai player bet, but then raising the
             // bet by an amount
 
+            var total = amount + game.AIPlayer.LastBetAmount;
+
             game.Player.LastBetAmount = amount;
             game.Player.LastBetType = BetType.Raise;
-            game.Player.LastBetChips = Serializer.Clone(game.Player.Chips);
+            game.Player.LastBetChips = GetChips(total);
+            game.Player.Cash -= total;
 
-            game.Player.Cash -= game.AIPlayer.LastBetAmount;
-            game.Player.Cash -= amount;
-
-            game.Pot += game.AIPlayer.LastBetAmount;
-            game.Pot += amount;
+            game.Pot += total;
         }
 
         return game;
@@ -147,15 +151,17 @@ public class BetService : IBetService
     {
         var chips = new List<Chip>();
 
-        foreach (var chip in _settings.Chips)
+        foreach (var chip in _settings.Chips.OrderByDescending(x => x.Value))
         {
             if (chip.Value > amount)
                 continue;
 
             chip.Quantity = amount / chip.Value;
+
             chips.Add(chip);
 
             var remainder = amount % chip.Value;
+
             if (remainder == 0)
                 break;
 
