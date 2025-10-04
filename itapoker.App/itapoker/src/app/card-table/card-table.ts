@@ -15,18 +15,21 @@ export class CardTable {
 
   game: any;
 
-  renderAlertSettings = {
-    message: "",
-    interval: 0,
-    visible: false
-  };
-
-  renderAnteUpSettings = {
-    interval: 0
-  };
-
-  renderDealSettings = {
-    interval: 0
+  ui = {
+    locked: false,
+    render: {
+      alert: {        
+        interval: 0,
+        message: "",
+        visible: false
+      },
+      anteUp: {
+        interval: 0
+      },
+      deal: {
+        interval: 0
+      }
+    }
   };
 
   constructor(
@@ -41,6 +44,7 @@ export class CardTable {
 
     if (!this.validator.validateAddChip(
       this.game, 
+      this.ui,
       this.gameEngine.getPlayerBet(this.game.player), 
       value))
       return;
@@ -61,19 +65,22 @@ export class CardTable {
   anteUpSuccess(response: any) {
     this.renderAnteUp();
     var wait = setInterval(() => {
-      if (this.renderAnteUpSettings.interval == 0) {
+      if (this.ui.render.anteUp.interval == 0) {
         clearInterval(wait);
         this.saveGame(response);
         this.renderAlert(response.alert);
+        this.unlockUI();
       }    
     }, 500);
   }
 
   apiCallError(error: any) {
     this.renderAlert(error);
+    this.unlockUI();
   }
 
   btnAnteClick() {
+    this.lockUI();
     this.apiConsumer.anteUp(
       this.game.gameId,
       this.anteUpSuccess.bind(this),
@@ -98,6 +105,7 @@ export class CardTable {
   }
 
   btnDealClick() {
+    this.lockUI();
     this.apiConsumer.deal(
       this.game.gameId,
       this.dealSuccess.bind(this),
@@ -160,7 +168,7 @@ export class CardTable {
 
   cardClick(rank: number, suit: number) {
 
-    if (!this.validator.validateHold(this.game))
+    if (!this.validator.validateHold(this.game, this.ui))
       return;
 
     this.apiConsumer.hold(
@@ -184,19 +192,20 @@ export class CardTable {
   }  
 
   clearAlert() {
-      clearInterval(this.renderAlertSettings.interval);
-      this.renderAlertSettings.interval = 0;
-      this.renderAlertSettings.message = "";
-      this.renderAlertSettings.visible = false;      
+      clearInterval(this.ui.render.alert.interval);
+      this.ui.render.alert.interval = 0;
+      this.ui.render.alert.message = "";
+      this.ui.render.alert.visible = false;      
   }
 
   dealSuccess(response: any) {
     this.saveGame(response);
     this.renderDeal();
     var wait = setInterval(() => {
-      if (this.renderDealSettings.interval == 0) {
+      if (this.ui.render.deal.interval == 0) {
         clearInterval(wait);
         this.renderAlert(response.alert);
+        this.unlockUI();
       }    
     }, 500);
   }
@@ -212,6 +221,10 @@ export class CardTable {
     this.renderAlert(response.alert);      
   }
 
+  lockUI() {
+    this.ui.locked = true;
+  }
+
   nextSuccess(response: any) {
     this.saveGame(response);
     this.renderAlert(response.alert);
@@ -225,7 +238,7 @@ export class CardTable {
 
   removeChipClick(value: number) {
 
-    if (!this.validator.validateRemoveChip(this.game))
+    if (!this.validator.validateRemoveChip(this.game, this.ui))
       return;
 
     this.apiConsumer.removeChip(
@@ -248,10 +261,10 @@ export class CardTable {
       return;
 
     this.clearAlert();
-    this.renderAlertSettings.message = message;
+    this.ui.render.alert.message = message;
 
-    this.renderAlertSettings.interval = setInterval(() => {
-      this.renderAlertSettings.visible = !this.renderAlertSettings.visible;
+    this.ui.render.alert.interval = setInterval(() => {
+      this.ui.render.alert.visible = !this.ui.render.alert.visible;
     }, 1000);
 
     setTimeout(() => {
@@ -260,8 +273,8 @@ export class CardTable {
   }
 
   renderAlertEnabled() {
-    return this.renderAlertSettings.interval > 0 && 
-           this.renderAlertSettings.visible;
+    return this.ui.render.alert.interval > 0 && 
+           this.ui.render.alert.visible;
   }
 
   renderAnteUp() {
@@ -276,7 +289,7 @@ export class CardTable {
     var index = 0;
     var renderAIPlayer = false;
 
-    this.renderAnteUpSettings.interval = setInterval(() => {
+    this.ui.render.anteUp.interval = setInterval(() => {
       if (!renderAIPlayer) {
         if (index >= this.game.anteChips.length) {        
           index = 0;
@@ -289,8 +302,8 @@ export class CardTable {
       }
       else {
         if (index >= this.game.anteChips.length) {
-          clearInterval(this.renderAnteUpSettings.interval);
-          this.renderAnteUpSettings.interval = 0;
+          clearInterval(this.ui.render.anteUp.interval);
+          this.ui.render.anteUp.interval = 0;
           this.game.player.chips = [];
           this.game.aiPlayer.chips = [];
           this.game.pot = pot;
@@ -305,13 +318,13 @@ export class CardTable {
   }
 
   renderAnteUpEnabled() {
-    return this.renderAnteUpSettings.interval > 0;
+    return this.ui.render.anteUp.interval > 0;
   }
 
   renderDeal() {
     var index = 0;
     var reveal = false;
-    this.renderDealSettings.interval = setInterval(() => {
+    this.ui.render.deal.interval = setInterval(() => {
       if (!reveal) {
         if (index >= this.game.player.cards.length) {
           reveal = true;
@@ -324,8 +337,8 @@ export class CardTable {
       }
       else {
         if (index < 0) {
-          clearInterval(this.renderDealSettings.interval);
-          this.renderDealSettings.interval = 0;
+          clearInterval(this.ui.render.deal.interval);
+          this.ui.render.deal.interval = 0;
         }
         else {
           this.game.player.cards[index--].reveal = true;
@@ -362,6 +375,10 @@ export class CardTable {
   }
 
   subTitleEnabled() {
-    return this.renderAlertSettings.interval == 0;
-  }  
+    return this.ui.render.alert.interval == 0;
+  }
+
+  unlockUI() {
+    this.ui.locked = false;
+  }
 }

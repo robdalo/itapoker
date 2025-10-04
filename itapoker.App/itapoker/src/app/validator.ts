@@ -5,7 +5,16 @@ import { Injectable } from '@angular/core';
 })
 export class Validator {
 
-  validateAddChip(game: any, playerBet: number, value: number) {
+  validateAddChip(
+    game: any, 
+    ui: any,
+    playerBet: number, 
+    value: number) {
+
+    // chips can only be added when the game is unlocked
+
+    if (ui.locked)
+      return false;
 
     // chips can only be added during pre draw and post draw betting
 
@@ -25,12 +34,23 @@ export class Validator {
     return true;
   }  
   
-  validateHold(game: any) {
+  validateHold(game: any, ui: any) {
+
+    // cards can only be held when the game is unlocked
+
+    if (ui.locked)
+      return false;
+
     // cards can only be held during draw
     return game.stage == 5;
   }
 
-  validateRemoveChip(game: any) {
+  validateRemoveChip(game: any, ui: any) {
+
+    // chips can only be removed when the game is unlocked
+
+    if (ui.locked)
+      return false;
 
     // chips can only be removed during pre draw and post draw betting
     
