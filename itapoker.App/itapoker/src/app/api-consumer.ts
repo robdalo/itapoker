@@ -12,13 +12,17 @@ export class ApiConsumer {
     "bet": "game/bet",
     "deal": "game/deal",
     "draw": "game/draw",
+    "getHighScores": "game/highscores",
     "hold": "game/hold",
     "next": "game/next",
     "removeChip": "game/chip/remove",
-    "showdown": "game/showdown"
+    "showdown": "game/showdown",
+    "singlePlayer": "game/singleplayer"
   };
+  
+  baseUrl = "http://localhost:5174/";
 
- constructor(
+  constructor(
     private http: HttpClient) {
   }
 
@@ -128,8 +132,7 @@ export class ApiConsumer {
   }
 
   getApiEndpoint(name: string) {
-    var baseUrl = "http://localhost:5174/";
-    return baseUrl + this.apiEndpoints[name];
+    return this.baseUrl + this.apiEndpoints[name];
   }
 
   hold(
@@ -148,6 +151,17 @@ export class ApiConsumer {
       error: error => errorCallback(error),
       complete: () => {}
     });    
+  }
+
+  getHighScores(
+    nextCallback: (response: any) => void,
+    errorCallback: (error: any) => void) 
+  {
+    this.http.get(this.getApiEndpoint("getHighScores")).subscribe({
+      next: response => nextCallback(response),
+      error: error => errorCallback(error),
+      complete: () => {}
+    });
   }
 
   next(
@@ -206,6 +220,20 @@ export class ApiConsumer {
       GameId: gameId      
     }).subscribe({
       next: response => nextCallback(response),
+      error: error => errorCallback(error),
+      complete: () => {}
+    });
+  }
+
+  singlePlayer(
+    playerName: string,
+    nextCallback: (response: any) => void,
+    errorCallback: (error: any) => void)
+  {
+    this.http.post(this.getApiEndpoint("singlePlayer"), {
+      PlayerName: playerName
+    }).subscribe({
+      next: value => nextCallback(value),
       error: error => errorCallback(error),
       complete: () => {}
     });

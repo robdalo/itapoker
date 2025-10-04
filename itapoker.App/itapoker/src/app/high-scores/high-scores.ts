@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { ApiConsumer } from '../api-consumer';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -11,15 +11,20 @@ import { RouterModule } from '@angular/router';
 })
 export class HighScores {
   
-  highScores: any[] = [];
+  highScores: any = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(private apiConsumer: ApiConsumer) {}
 
   ngOnInit() {
-    this.http
-      .get<any[]>('http://localhost:5174/game/highscores')
-      .subscribe(data => {
-        this.highScores = data;
-    });
+    this.apiConsumer.getHighScores(
+      this.getHighScoresSuccess.bind(this), 
+      this.getHighScoresError.bind(this));
+  }
+
+  getHighScoresError(error: any) {
+  }
+
+  getHighScoresSuccess(response: any) {
+    this.highScores = response;
   }
 }

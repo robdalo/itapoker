@@ -4,6 +4,7 @@ using itapoker.Core.Domain.Requests;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
 using itapoker.Core.Services.Interfaces;
+using itapoker.Shared.Consumers;
 
 namespace itapoker.Core;
 
@@ -83,6 +84,7 @@ public class GameEngine : IGameEngine
 
             game.Player.LastBetAmount = 0;
             game.Player.LastBetType = BetType.Fold;
+            game.Player.LastBetChips = new();
 
             game.AIPlayer.Cash += game.Pot;
 
@@ -96,6 +98,7 @@ public class GameEngine : IGameEngine
 
             game.Player.LastBetAmount = 0;
             game.Player.LastBetType = BetType.Check;
+            game.Player.LastBetChips = new();
         }
         else if (request.BetType == BetType.Call)
         {
@@ -104,6 +107,8 @@ public class GameEngine : IGameEngine
 
             game.Player.LastBetAmount = game.AIPlayer.LastBetAmount;
             game.Player.LastBetType = BetType.Call;
+            game.Player.LastBetChips = new();
+
             game.Player.Cash -= game.Player.LastBetAmount;
 
             game.Pot += game.Player.LastBetAmount;
@@ -118,6 +123,8 @@ public class GameEngine : IGameEngine
 
             game.Player.LastBetAmount = request.Amount;
             game.Player.LastBetType = BetType.Raise;
+            game.Player.LastBetChips = Serializer.Clone(game.Player.Chips);
+
             game.Player.Cash -= game.AIPlayer.LastBetAmount;
             game.Player.Cash -= request.Amount;
 

@@ -15,7 +15,6 @@ const { ipcRenderer } = window.require ? window.require('electron') : {};
 export class MainMenu {
 
   btnQuitClick() {
-    
     if (ipcRenderer) {
       ipcRenderer.send('quit-app');
     }

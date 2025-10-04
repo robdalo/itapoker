@@ -4,6 +4,11 @@ namespace itapoker.Shared.Consumers;
 
 public static class Serializer
 {
+    public static T Clone<T>(T obj)
+    {
+        return Deserialize<T>(Serialize(obj));
+    }
+
     public static T Deserialize<T>(string value)
     {
         return JsonConvert.DeserializeObject<T>(value);

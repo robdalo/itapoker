@@ -14,6 +14,7 @@ public class Player
     public HandType HandType { get; set; }
     public BetType LastBetType { get; set; }
     public int LastBetAmount { get; set; }
+    public List<Chip> LastBetChips { get; set; } = new();
     public List<Card> Cards { get; set; } = new();
     public List<Chip> Chips { get; set; } = new();
     public string LastBetTypeTitle => GetBetTypeTitle(this.LastBetType);

@@ -28,6 +28,10 @@ export class CardTable {
         interval: 0,
         enabled() { return this.interval > 0; }
       },
+      bet: {
+        interval: 0,
+        enabled() { return this.interval > 0; }
+      },
       deal: {
         interval: 0
       }
@@ -36,15 +40,17 @@ export class CardTable {
 
   constructor(
     private apiConsumer: ApiConsumer,
-    protected gameEngine: GameEngine,
+    private gameEngine: GameEngine,
     private router: Router,
-    private validator: Validator) {
-      this.game = this.gameEngine.getGame();
+    private validator: Validator) {}
+
+  ngOnInit() {
+    this.game = this.gameEngine.getGame();
   }
 
   addChipClick(value: number) {
 
-    if (!this.validator.validateAddChip(
+    if (!this.validator.addChipOK(
       this.game, 
       this.ui,
       this.gameEngine.getPlayerBet(this.game.player), 
@@ -62,6 +68,23 @@ export class CardTable {
     this.showAllCards(response);
     this.showAllChips(response);
     this.saveGame(response);
+  }
+
+  aiPlayerBetEnabled() {
+    return this.ui.render.anteUp.enabled();
+  }
+
+  aiPlayerLastBetEnabled() {
+    return this.gameEngine.playerBetEnabled(this.game) && 
+          !this.ui.render.anteUp.enabled()
+  }
+
+  aiPlayerWinningsEnabled() {
+    return this.gameEngine.playerWinningsEnabled(this.game.aiPlayer);
+  }
+
+  anteUpEnabled() {
+    return this.gameEngine.anteUpEnabled(this.game);
   }
 
   anteUpSuccess(response: any) {
@@ -162,6 +185,10 @@ export class CardTable {
     );
   }
 
+  callEnabled() {
+    return this.gameEngine.callEnabled(this.game);
+  }
+
   callSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
@@ -170,7 +197,7 @@ export class CardTable {
 
   cardClick(rank: number, suit: number) {
 
-    if (!this.validator.validateHold(this.game, this.ui))
+    if (!this.validator.holdOK(this.game, this.ui))
       return;
 
     this.apiConsumer.hold(
@@ -187,6 +214,10 @@ export class CardTable {
     this.saveGame(response);
   }
 
+  checkEnabled() {
+    return this.gameEngine.checkEnabled(this.game);
+  }
+
   checkSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
@@ -198,6 +229,10 @@ export class CardTable {
       this.ui.render.alert.interval = 0;
       this.ui.render.alert.message = "";
       this.ui.render.alert.visible = false;      
+  }
+
+  dealEnabled() {
+    return this.gameEngine.dealEnabled(this.game);
   }
 
   dealSuccess(response: any) {
@@ -212,15 +247,43 @@ export class CardTable {
     }, 500);
   }
 
+  drawEnabled() {
+    return this.gameEngine.drawEnabled(this.game);
+  }
+
   drawSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
     this.renderAlert(response.alert);
   }
 
+  foldEnabled() {
+    return this.gameEngine.foldEnabled(this.game);
+  }
+
   foldSuccess(response: any) {
     this.saveGame(response);
     this.renderAlert(response.alert);      
+  }
+
+  gameOverEnabled() {
+    return this.gameEngine.gameOverEnabled(this.game);
+  }
+
+  getAIPlayerBet() {
+    return this.gameEngine.getPlayerBet(this.game.aiPlayer);
+  }
+
+  getCardUrl(card: any) {
+    return this.gameEngine.getCardUrl(card);
+  }
+
+  getHand() {
+    return this.gameEngine.getHand(this.game);
+  }
+
+  getPlayerBet() {
+    return this.gameEngine.getPlayerBet(this.game.player);
   }
 
   lockUI() {
@@ -232,6 +295,22 @@ export class CardTable {
     this.renderAlert(response.alert);
   }
 
+  playerBetEnabled() {
+    return this.gameEngine.playerBetEnabled(this.game);
+  }
+
+  playerHandEnabled() {
+    return this.gameEngine.playerHandEnabled(this.game);
+  }
+
+  playerWinningsEnabled() {
+    return this.gameEngine.playerWinningsEnabled(this.game.player);
+  }
+
+  raiseEnabled() {
+    return this.gameEngine.raiseEnabled(this.game);
+  }
+
   raiseSuccess(response: any) {
     this.showAllCards(response);
     this.saveGame(response);
@@ -240,7 +319,7 @@ export class CardTable {
 
   removeChipClick(value: number) {
 
-    if (!this.validator.validateRemoveChip(this.game, this.ui))
+    if (!this.validator.removeChipOK(this.game, this.ui))
       return;
 
     this.apiConsumer.removeChip(
@@ -342,8 +421,7 @@ export class CardTable {
   }
 
   saveGame(response: any) {
-    this.gameEngine.saveGame(response);
-    this.game = this.gameEngine.getGame();
+    this.game = this.gameEngine.saveGame(response);
   }
 
   showAllCards(game: any) {
@@ -359,6 +437,10 @@ export class CardTable {
     chips.forEach(x => {
       x.visible = true;
     });
+  }
+
+  showdownEnabled() {
+    return this.gameEngine.showdownEnabled(this.game);
   }
 
   showdownSuccess(response: any) {

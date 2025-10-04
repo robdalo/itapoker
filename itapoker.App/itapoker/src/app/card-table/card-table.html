@@ -15,12 +15,12 @@
 
     <div class="card-table-sub-header">
         <div class="card-table-sub-header-left">
-            <h5>{{ gameEngine.getHand(game) }}</h5>
+            <h5>{{ getHand() }}</h5>
         </div>
         <div class="card-table-sub-header-centre">
             <h5 *ngIf="subTitleEnabled()">{{ game.subTitle }}</h5>
-            <h5 *ngIf="this.ui.render.alert.enabled()">{{ ui.render.alert.message }}</h5>
-            <br *ngIf="!subTitleEnabled() && !this.ui.render.alert.enabled()" />
+            <h5 *ngIf="ui.render.alert.enabled()">{{ ui.render.alert.message }}</h5>
+            <br *ngIf="!subTitleEnabled() && !ui.render.alert.enabled()" />
         </div>
         <div class="card-table-sub-header-right">
             <h5>${{ game.pot }}</h5>
@@ -28,10 +28,10 @@
     </div>
 
     <div class="card-table-content">
-        <div class="card-table-player-hand" *ngIf="!gameEngine.playerHandEnabled(game)">
+        <div class="card-table-player-hand" *ngIf="!playerHandEnabled()">
             <div class="end">
-                <br *ngIf="!this.ui.render.anteUp.enabled()" />
-                <div *ngIf="this.ui.render.anteUp.enabled()" class="card-table-bets">
+                <br *ngIf="!ui.render.anteUp.enabled()" />
+                <div *ngIf="ui.render.anteUp.enabled()" class="card-table-bets">
                     <div *ngFor="let chip of game.aiPlayer.chips; let i = index">
                         <div *ngIf="chip.visible">
                             <img [src]="chip.url" [alt]="chip.title" />
@@ -48,8 +48,8 @@
             <div class="card"><br /></div>
             <div class="card"><br /></div>
             <div class="end">
-                <br *ngIf="!this.ui.render.anteUp.enabled()" />
-                <div *ngIf="this.ui.render.anteUp.enabled()" class="card-table-bets">
+                <br *ngIf="!ui.render.anteUp.enabled()" />
+                <div *ngIf="ui.render.anteUp.enabled()" class="card-table-bets">
                     <div *ngFor="let chip of game.player.chips; let i = index">
                         <div *ngIf="chip.visible">
                             <img [src]="chip.url" [alt]="chip.title" />
@@ -59,10 +59,10 @@
                 </div>
             </div>
         </div>
-        <div class="card-table-player-hand" *ngIf="gameEngine.playerHandEnabled(game)">
+        <div class="card-table-player-hand" *ngIf="playerHandEnabled()">
             <div class="end"><br /></div>
             <div *ngFor="let card of game.player.cards; let i = index" class="card">
-                <img *ngIf="card.visible" src="{{ gameEngine.getCardUrl(card) }}" alt="{{ card.title }}" (click)="cardClick(card.rank, card.suit)" />
+                <img *ngIf="card.visible" src="{{ getCardUrl(card) }}" alt="{{ card.title }}" (click)="cardClick(card.rank, card.suit)" />
                 <span *ngIf="card.hold">HOLD</span>
             </div>
             <div class="end">
@@ -80,10 +80,10 @@
 
     <div class="card-table-sub-footer">
         <div class="card-table-sub-footer-left">
-            <h5 *ngIf="this.ui.render.anteUp.enabled()">${{ gameEngine.getPlayerBet(game.aiPlayer) }}</h5>
-            <h5 *ngIf="gameEngine.playerBetEnabled(game) && !this.ui.render.anteUp.enabled()">${{ game.aiPlayer.lastBetAmount }} <span>{{ game.aiPlayer.lastBetTypeTitle }}</span></h5>
-            <h4 *ngIf="gameEngine.gameOverEnabled(game)">{{ game.aiPlayer.hand }}</h4>
-            <br *ngIf="!gameEngine.playerBetEnabled(game) && !gameEngine.gameOverEnabled(game) && !this.ui.render.anteUp.enabled()" />
+            <h5 *ngIf="aiPlayerBetEnabled()">${{ getAIPlayerBet() }}</h5>
+            <h5 *ngIf="aiPlayerLastBetEnabled()">${{ game.aiPlayer.lastBetAmount }} <span>{{ game.aiPlayer.lastBetTypeTitle }}</span></h5>
+            <h4 *ngIf="gameOverEnabled()">{{ game.aiPlayer.hand }}</h4>
+            <br *ngIf="!aiPlayerBetEnabled() && !aiPlayerLastBetEnabled() && !gameOverEnabled()" />
         </div>
         <div class="card-table-sub-footer-centre">
             <div class="card-table-chips">
@@ -94,9 +94,9 @@
             </div>
         </div>
         <div class="card-table-sub-footer-right">
-            <h5 *ngIf="gameEngine.playerBetEnabled(game)">${{ gameEngine.getPlayerBet(game.player) }}</h5>
-            <h4 *ngIf="gameEngine.gameOverEnabled(game)">{{ game.player.hand }}</h4>
-            <br *ngIf="!gameEngine.playerBetEnabled(game) && !gameEngine.gameOverEnabled(game)" />
+            <h5 *ngIf="playerBetEnabled()">${{ getPlayerBet() }}</h5>
+            <h4 *ngIf="gameOverEnabled()">{{ game.player.hand }}</h4>
+            <br *ngIf="!playerBetEnabled() && !gameOverEnabled()" />
         </div>
     </div>
 
@@ -104,29 +104,29 @@
         <div class="card-table-footer-left">
             <h3>AI Player</h3>
             <h3>Cash: ${{ game.aiPlayer.cash }}</h3>
-            <h3 *ngIf="gameEngine.playerWinningsEnabled(game.aiPlayer)">Win: ${{ game.aiPlayer.winnings }}</h3>
-            <h3 *ngIf="!gameEngine.playerWinningsEnabled(game.aiPlayer)" class="loss">Loss: ${{ game.aiPlayer.winnings * -1 }}</h3>
+            <h3 *ngIf="aiPlayerWinningsEnabled()">Win: ${{ game.aiPlayer.winnings }}</h3>
+            <h3 *ngIf="!aiPlayerWinningsEnabled()" class="loss">Loss: ${{ game.aiPlayer.winnings * -1 }}</h3>
         </div>
         <div class="card-table-footer-centre">
             <img src="images/loading.gif" alt="Loading..." *ngIf="ui.locked" />
             <div *ngIf="!ui.locked">
-                <button type="button" *ngIf="gameEngine.anteUpEnabled(game)" (click)="btnAnteClick()">Ante</button>
-                <button type="button" *ngIf="gameEngine.dealEnabled(game)" (click)="btnDealClick()">Deal</button>
-                <button type="button" *ngIf="gameEngine.foldEnabled(game)" (click)="btnFoldClick()" class="fold">Fold</button>               
-                <button type="button" *ngIf="gameEngine.checkEnabled(game)" (click)="btnCheckClick()">Check</button>
-                <button type="button" *ngIf="gameEngine.callEnabled(game)" (click)="btnCallClick()">Call</button>
-                <button type="button" *ngIf="gameEngine.raiseEnabled(game)" (click)="btnRaiseClick()">Raise</button>
-                <button type="button" *ngIf="gameEngine.drawEnabled(game)" (click)="btnDrawClick()">Draw</button>
-                <button type="button" *ngIf="gameEngine.showdownEnabled(game)" (click)="btnShowdownClick()">Showdown</button>
-                <button type="button" *ngIf="gameEngine.gameOverEnabled(game)" (click)="btnRetireClick()" class="fold">Retire</button>
-                <button type="button" *ngIf="gameEngine.gameOverEnabled(game)" (click)="btnNextClick()">Next</button>
+                <button type="button" *ngIf="anteUpEnabled()" (click)="btnAnteClick()">Ante</button>
+                <button type="button" *ngIf="dealEnabled()" (click)="btnDealClick()">Deal</button>
+                <button type="button" *ngIf="foldEnabled()" (click)="btnFoldClick()" class="fold">Fold</button>               
+                <button type="button" *ngIf="checkEnabled()" (click)="btnCheckClick()">Check</button>
+                <button type="button" *ngIf="callEnabled()" (click)="btnCallClick()">Call</button>
+                <button type="button" *ngIf="raiseEnabled()" (click)="btnRaiseClick()">Raise</button>
+                <button type="button" *ngIf="drawEnabled()" (click)="btnDrawClick()">Draw</button>
+                <button type="button" *ngIf="showdownEnabled()" (click)="btnShowdownClick()">Showdown</button>
+                <button type="button" *ngIf="gameOverEnabled()" (click)="btnRetireClick()" class="fold">Retire</button>
+                <button type="button" *ngIf="gameOverEnabled()" (click)="btnNextClick()">Next</button>
             </div>
         </div>
         <div class="card-table-footer-right">
             <h3>Player</h3>
             <h3>Cash: ${{ game.player.cash }}</h3>
-            <h3 *ngIf="gameEngine.playerWinningsEnabled(game.player)">Win: ${{ game.player.winnings }}</h3>
-            <h3 *ngIf="!gameEngine.playerWinningsEnabled(game.player)" class="loss">Loss: ${{ game.player.winnings * -1 }}</h3>     
+            <h3 *ngIf="playerWinningsEnabled()">Win: ${{ game.player.winnings }}</h3>
+            <h3 *ngIf="!playerWinningsEnabled()" class="loss">Loss: ${{ game.player.winnings * -1 }}</h3>     
         </div>
     </div>
 </div>

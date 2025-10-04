@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class Validator {
 
-  validateAddChip(
+  addChipOK(
     game: any, 
     ui: any,
     playerBet: number, 
@@ -34,7 +34,7 @@ export class Validator {
     return true;
   }  
   
-  validateHold(game: any, ui: any) {
+  holdOK(game: any, ui: any) {
 
     // cards can only be held when the game is unlocked
 
@@ -45,7 +45,7 @@ export class Validator {
     return game.stage == 5;
   }
 
-  validateRemoveChip(game: any, ui: any) {
+  removeChipOK(game: any, ui: any) {
 
     // chips can only be removed when the game is unlocked
 
@@ -58,5 +58,25 @@ export class Validator {
       return false;
 
     return true;
-  }  
+  }
+
+  singlePlayerOK(playerName: string) {
+    
+    // player name cannot be null or empty
+
+    if (!playerName)
+      return false;
+
+    // player name cannot be white space only
+
+    if (playerName.trim().length < 1)
+      return false;
+
+    // player name cannot be greater than 10 characters
+
+    if (playerName.length > 10)
+      return false;
+
+    return true;
+  }
 }

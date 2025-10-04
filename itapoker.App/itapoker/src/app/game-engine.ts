@@ -56,11 +56,7 @@ export class GameEngine {
   }
 
   getCardUrl(card: any) {
-
-    if (!card.reveal)
-      return "images/cards/back.png";
-
-    return card.url;
+    return card.reveal ? card.url : "images/cards/back.png";
   }
 
   getGame() {
@@ -84,6 +80,8 @@ export class GameEngine {
   }
 
   playerBetEnabled(game: any) {
+    // player bet is only enabled when ante up is enabled or
+    // betting is enabled
     return this.anteUpEnabled(game) || 
            this.betEnabled(game);
   }
@@ -95,6 +93,8 @@ export class GameEngine {
   }
 
   playerWinningsEnabled(player: any) {
+    // player winnings is only enabled when player winnings 
+    // is greater than zero
     return player.winnings >= 0;
   }
 
@@ -110,6 +110,7 @@ export class GameEngine {
 
   saveGame(game: any) {
     localStorage.setItem("game", JSON.stringify(game));
+    return this.getGame();
   }  
 
   showdownEnabled(game: any) {

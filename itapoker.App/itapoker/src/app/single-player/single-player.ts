@@ -1,7 +1,9 @@
+import { ApiConsumer } from '../api-consumer';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
+import { GameEngine } from '../game-engine';
 import { Router, RouterModule } from '@angular/router';
+import { Validator } from '../validator';
 
 @Component({
   selector: 'app-single-player',
@@ -10,34 +12,33 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './single-player.css'
 })
 export class SinglePlayer {
-  playerName = String();
-  cash = String();
-  ante = String();
-  limit = String();
+
+  ui = {
+    playerName: ""
+  };
 
   constructor(
-    private http: HttpClient,
-    private router: Router) {
-  }
+    private apiConsumer: ApiConsumer,
+    private gameEngine: GameEngine,
+    private router: Router,
+    private validator: Validator) {}
 
   startGameClick() {
 
-    var request = {
-      PlayerName: this.playerName
-    };
+    if (!this.validator.singlePlayerOK(this.ui.playerName))
+      return;
 
-    this.http.post("http://localhost:5174/game/singleplayer", request).subscribe({
-      next: value => this.startGameSuccess(value),
-      error: err => this.startGameError(err),
-      complete: () => {}
-    });
+    this.apiConsumer.singlePlayer(
+      this.ui.playerName,
+      this.singlePlayerSuccess.bind(this),
+      this.singlePlayerError.bind(this));
   }
 
-  startGameSuccess(response: any) {
-    localStorage.setItem("game", JSON.stringify(response));
+  singlePlayerError(error: any) {
+  }
+
+  singlePlayerSuccess(response: any) {
+    this.gameEngine.saveGame(response);
     this.router.navigate(['/card-table']);
-  }
-
-  startGameError(error: any) {
   }
 }
