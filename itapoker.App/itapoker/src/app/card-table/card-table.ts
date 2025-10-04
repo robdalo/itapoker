@@ -75,8 +75,12 @@ export class CardTable {
   }
 
   aiPlayerLastBetEnabled() {
-    return this.gameEngine.playerBetEnabled(this.game) && 
-          !this.ui.render.anteUp.enabled()
+    return (
+      this.gameEngine.drawEnabled(this.game) ||
+      this.gameEngine.showdownEnabled(this.game) || (
+        this.gameEngine.playerBetEnabled(this.game) && 
+       !this.ui.render.anteUp.enabled()
+    ));
   }
 
   aiPlayerWinningsEnabled() {
@@ -105,6 +109,7 @@ export class CardTable {
   }
 
   btnAnteClick() {
+    this.clearAlert();
     this.lockUI();
     this.apiConsumer.anteUp(
       this.game.gameId,
@@ -114,6 +119,7 @@ export class CardTable {
   }
 
   btnCallClick() {
+    this.clearAlert();
     this.apiConsumer.call(
       this.game.gameId,
       this.callSuccess.bind(this),
@@ -122,6 +128,7 @@ export class CardTable {
   }
 
   btnCheckClick() {
+    this.clearAlert();
     this.apiConsumer.check(
       this.game.gameId,
       this.checkSuccess.bind(this),
@@ -130,6 +137,7 @@ export class CardTable {
   }
 
   btnDealClick() {
+    this.clearAlert();
     this.lockUI();
     this.apiConsumer.deal(
       this.game.gameId,
@@ -140,6 +148,7 @@ export class CardTable {
 
   btnDrawClick() {
     var cards = this.game.player.cards as any[];
+    this.clearAlert();
     this.apiConsumer.draw(
       this.game.gameId,
       cards.filter(item => !item.hold),
@@ -149,6 +158,7 @@ export class CardTable {
   }
 
   btnFoldClick() {
+    this.clearAlert();
     this.apiConsumer.fold(
       this.game.gameId,
       this.foldSuccess.bind(this),
@@ -157,6 +167,7 @@ export class CardTable {
   }
 
   btnNextClick() {
+    this.clearAlert();
     this.apiConsumer.next(
       this.game.gameId,
       this.nextSuccess.bind(this),
@@ -165,6 +176,7 @@ export class CardTable {
   }
 
   btnRaiseClick() {
+    this.clearAlert();
     this.apiConsumer.raise(
       this.game.gameId,
       this.gameEngine.getPlayerBet(this.game.player),
@@ -178,6 +190,7 @@ export class CardTable {
   }
 
   btnShowdownClick() {
+    this.clearAlert();
     this.apiConsumer.showdown(
       this.game.gameId,
       this.showdownSuccess.bind(this),
@@ -341,7 +354,6 @@ export class CardTable {
     if (!message)
       return;
 
-    this.clearAlert();
     this.ui.render.alert.message = message;
 
     this.ui.render.alert.interval = setInterval(() => {
