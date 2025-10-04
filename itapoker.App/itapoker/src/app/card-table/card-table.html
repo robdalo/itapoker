@@ -19,8 +19,8 @@
         </div>
         <div class="card-table-sub-header-centre">
             <h5 *ngIf="subTitleEnabled()">{{ game.subTitle }}</h5>
-            <h5 *ngIf="renderAlertEnabled()">{{ ui.render.alert.message }}</h5>
-            <br *ngIf="!subTitleEnabled() && !renderAlertEnabled()" />
+            <h5 *ngIf="this.ui.render.alert.enabled()">{{ ui.render.alert.message }}</h5>
+            <br *ngIf="!subTitleEnabled() && !this.ui.render.alert.enabled()" />
         </div>
         <div class="card-table-sub-header-right">
             <h5>${{ game.pot }}</h5>
@@ -30,8 +30,8 @@
     <div class="card-table-content">
         <div class="card-table-player-hand" *ngIf="!gameEngine.playerHandEnabled(game)">
             <div class="end">
-                <br *ngIf="!renderAnteUpEnabled()" />
-                <div *ngIf="renderAnteUpEnabled()" class="card-table-bets">
+                <br *ngIf="!this.ui.render.anteUp.enabled()" />
+                <div *ngIf="this.ui.render.anteUp.enabled()" class="card-table-bets">
                     <div *ngFor="let chip of game.aiPlayer.chips; let i = index">
                         <div *ngIf="chip.visible">
                             <img [src]="chip.url" [alt]="chip.title" />
@@ -48,8 +48,8 @@
             <div class="card"><br /></div>
             <div class="card"><br /></div>
             <div class="end">
-                <br *ngIf="!renderAnteUpEnabled()" />
-                <div *ngIf="renderAnteUpEnabled()" class="card-table-bets">
+                <br *ngIf="!this.ui.render.anteUp.enabled()" />
+                <div *ngIf="this.ui.render.anteUp.enabled()" class="card-table-bets">
                     <div *ngFor="let chip of game.player.chips; let i = index">
                         <div *ngIf="chip.visible">
                             <img [src]="chip.url" [alt]="chip.title" />
@@ -80,10 +80,10 @@
 
     <div class="card-table-sub-footer">
         <div class="card-table-sub-footer-left">
-            <h5 *ngIf="renderAnteUpEnabled()">${{ gameEngine.getPlayerBet(game.aiPlayer) }}</h5>
-            <h5 *ngIf="gameEngine.playerBetEnabled(game) && !renderAnteUpEnabled()">${{ game.aiPlayer.lastBetAmount }} <span>{{ game.aiPlayer.lastBetTypeTitle }}</span></h5>
+            <h5 *ngIf="this.ui.render.anteUp.enabled()">${{ gameEngine.getPlayerBet(game.aiPlayer) }}</h5>
+            <h5 *ngIf="gameEngine.playerBetEnabled(game) && !this.ui.render.anteUp.enabled()">${{ game.aiPlayer.lastBetAmount }} <span>{{ game.aiPlayer.lastBetTypeTitle }}</span></h5>
             <h4 *ngIf="gameEngine.gameOverEnabled(game)">{{ game.aiPlayer.hand }}</h4>
-            <br *ngIf="!gameEngine.playerBetEnabled(game) && !gameEngine.gameOverEnabled(game) && !renderAnteUpEnabled()" />
+            <br *ngIf="!gameEngine.playerBetEnabled(game) && !gameEngine.gameOverEnabled(game) && !this.ui.render.anteUp.enabled()" />
         </div>
         <div class="card-table-sub-footer-centre">
             <div class="card-table-chips">

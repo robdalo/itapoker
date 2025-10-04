@@ -21,10 +21,12 @@ export class CardTable {
       alert: {        
         interval: 0,
         message: "",
-        visible: false
+        visible: false,
+        enabled() { return this.interval > 0 && this.visible; }
       },
       anteUp: {
-        interval: 0
+        interval: 0,
+        enabled() { return this.interval > 0; }
       },
       deal: {
         interval: 0
@@ -272,11 +274,6 @@ export class CardTable {
     }, 10000);
   }
 
-  renderAlertEnabled() {
-    return this.ui.render.alert.interval > 0 && 
-           this.ui.render.alert.visible;
-  }
-
   renderAnteUp() {
     var pot = this.game.pot;
 
@@ -315,10 +312,6 @@ export class CardTable {
         }       
       }
     }, 1000);
-  }
-
-  renderAnteUpEnabled() {
-    return this.ui.render.anteUp.interval > 0;
   }
 
   renderDeal() {
