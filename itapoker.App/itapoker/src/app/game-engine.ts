@@ -98,7 +98,7 @@ export class GameEngine {
   }
 
   playerLastBetEnabled(game: any) {
-    // player last bet is only enabled when game stage is showdown
+    // player last bet is only enabled when game stage is game over
     // and player has folded
     return game.stage == 8 &&
            game.player.lastBetType == 3;

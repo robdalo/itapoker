@@ -105,7 +105,10 @@ export class CardTable {
       this.gameEngine.showdownEnabled(this.game) || (
         this.gameEngine.playerBetEnabled(this.game) && 
        !this.ui.render.anteUp.enabled()
-    ));
+      ) || (
+        this.gameEngine.gameOverEnabled(this.game) &&
+        this.game.aiPlayer.lastBetType == 3
+      ));
   }
 
   aiPlayerWinningsEnabled() {
