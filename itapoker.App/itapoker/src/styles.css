@@ -19,12 +19,12 @@ h5 { font-size: 150%; font-weight: bold; color: yellow; text-transform: uppercas
 .card-table-sub-header-right h5 { font-size: 220%; font-weight: bold; color: white; }
 .card-table-sub-footer { height: 60px; clear: both; padding: 12px; background: green; border-top: 16px solid limegreen; text-align: center; }
 .card-table-sub-footer-left { width: 33%; float: left; text-align: left; }
-.card-table-sub-footer-left h4 { margin-top: 16px; font-size: 150%; color: yellow; text-align: center; }
+.card-table-sub-footer-left h4 { margin-top: 16px; font-size: 150%; color: yellow; text-align: center; cursor: pointer; }
 .card-table-sub-footer-left h5 { margin-top: 8px; font-size: 250%; color: white; }
 .card-table-sub-footer-left span { color: yellow; }
 .card-table-sub-footer-centre { width: 34%; float: left; text-align: center; }
 .card-table-sub-footer-right { width: 33%; float: left; clear: right; text-align: right; }
-.card-table-sub-footer-right h4 { margin-top: 16px; font-size: 150%; color: yellow; text-align: center; }
+.card-table-sub-footer-right h4 { margin-top: 16px; font-size: 150%; color: yellow; text-align: center; cursor: pointer; }
 .card-table-sub-footer-right h5 { margin-top: 8px; font-size: 250%; color: white; }
 .card-table-sub-footer-right span { color: yellow; }
 .card-table-footer { height: 70px; clear: both; padding: 12px; background: limegreen; }

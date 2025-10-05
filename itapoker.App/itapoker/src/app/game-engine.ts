@@ -5,6 +5,11 @@ import { Injectable } from '@angular/core';
 })
 export class GameEngine {
 
+  aiPlayerHandEnabled(game: any) {
+    // ai player hand is only enabled when game stage is game over
+    return game.stage == 8;
+  }  
+
   anteUpEnabled(game: any) {
     // ante up is only enabled when the game stage is ante up
     return game.stage == 2;
@@ -88,7 +93,7 @@ export class GameEngine {
 
   playerHandEnabled(game: any) {
     // player hand is only enabled when game stage has 
-    // progressed past deal
+    // progressed past deal, but has not reached game over
     return game.stage > 3;
   }
 

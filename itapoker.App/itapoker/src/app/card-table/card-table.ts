@@ -17,6 +17,14 @@ export class CardTable {
 
   ui = {
     locked: false,
+    hand: {
+      aiPlayer: {
+        visible: false
+      },
+      player: {
+        visible: true
+      }
+    },
     render: {
       alert: {        
         interval: 0,
@@ -33,6 +41,9 @@ export class CardTable {
         enabled() { return this.interval > 0; }
       },
       deal: {
+        interval: 0
+      },
+      draw: {
         interval: 0
       }
     }
@@ -65,13 +76,27 @@ export class CardTable {
   }
 
   addChipSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.showAllChips(response);
     this.saveGame(response);
   }
 
   aiPlayerBetEnabled() {
     return this.ui.render.anteUp.enabled();
+  }
+
+  aiPlayerHandClick() {
+
+    if (!this.validator.playerHandClick(this.game))
+      return;
+
+    this.ui.hand.aiPlayer.visible = true;
+    this.ui.hand.player.visible = false;
+  }
+
+  aiPlayerHandEnabled() {
+    return this.ui.hand.aiPlayer.visible &&
+           this.gameEngine.aiPlayerHandEnabled(this.game);
   }
 
   aiPlayerLastBetEnabled() {
@@ -209,7 +234,7 @@ export class CardTable {
   }
 
   callSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.saveGame(response);
     this.renderAlert(response.alert);
     this.unlockUI();
@@ -230,7 +255,7 @@ export class CardTable {
   }
 
   cardClickSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.saveGame(response);
   }
 
@@ -239,7 +264,7 @@ export class CardTable {
   }
 
   checkSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.renderBet(response);
     var wait = setInterval(() => {
       if (this.ui.render.bet.interval == 0) {
@@ -279,10 +304,16 @@ export class CardTable {
   }
 
   drawSuccess(response: any) {
-    this.showAllCards(response);
-    this.saveGame(response);
-    this.renderAlert(response.alert);
-    this.unlockUI();
+    this.showAllCards(response.player.cards);
+    this.renderDraw(response);
+    var wait = setInterval(() => {
+      if (this.ui.render.draw.interval == 0) {
+        clearInterval(wait);
+        this.saveGame(response);
+        this.renderAlert(response.alert);
+        this.unlockUI();
+      }
+    }, 500);
   }
 
   foldEnabled() {
@@ -321,6 +352,7 @@ export class CardTable {
 
   nextSuccess(response: any) {
     this.saveGame(response);
+    this.resetHandVisibility();
     this.renderAlert(response.alert);
     this.unlockUI();
   }
@@ -329,8 +361,18 @@ export class CardTable {
     return this.gameEngine.playerBetEnabled(this.game);
   }
 
+  playerHandClick() {
+    
+    if (!this.validator.playerHandClick(this.game))
+      return;
+
+    this.ui.hand.aiPlayer.visible = false;
+    this.ui.hand.player.visible = true;
+  }
+
   playerHandEnabled() {
-    return this.gameEngine.playerHandEnabled(this.game);
+    return this.ui.hand.player.visible &&
+           this.gameEngine.playerHandEnabled(this.game);
   }
 
   playerLastBetEnabled() {
@@ -346,7 +388,7 @@ export class CardTable {
   }
 
   raiseSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.renderBet(response);
     var wait = setInterval(() => {
       if (this.ui.render.bet.interval == 0) {
@@ -372,7 +414,7 @@ export class CardTable {
   }
 
   removeChipSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.player.cards);
     this.showAllChips(response);
     this.saveGame(response);
   }
@@ -453,7 +495,6 @@ export class CardTable {
         }
         else {
           this.game.player.cards[index++].visible = true;
-          this.saveGame(this.game);
         }
       }
       else {
@@ -463,18 +504,65 @@ export class CardTable {
         }
         else {
           this.game.player.cards[index--].reveal = true;
-          this.saveGame(this.game);
         }
       }
     }, 500);
+  }
+
+  renderDraw(response: any) {
+
+    var discarded: any[] = [];
+    var replaced: any[] = [];
+    var cards = this.game.player.cards as any[];
+    var cardsPostDraw = response.player.cards as any[];
+
+    cards.forEach(x => {
+      if (cardsPostDraw.filter(y => y.rank == x.rank && y.suit == x.suit).length == 0)
+        discarded.push(x);
+    });
+
+    cardsPostDraw.forEach(x => {
+      if (cards.filter(y => y.rank == x.rank && y.suit == x.suit).length == 0)
+        replaced.push(x);
+    });
+
+    this.ui.render.draw.interval = setInterval(() => {
+      if (discarded.length > 0) {
+        var discard = discarded.pop();
+        var replace = replaced.pop(); 
+        var existing = cards.filter(x => x.rank == discard.rank && x.suit == discard.suit)[0];
+        
+        existing.visible = false;
+        existing.reveal = false;
+        existing.rank = replace.rank;
+        existing.suit = replace.suit;
+        existing.title = replace.title;
+        existing.hold = replace.hold;
+        existing.url = replace.url;
+      }
+      else if (cards.filter(x => !x.visible).length > 0) {
+        cards.filter(x => !x.visible)[0].visible = true;
+      }
+      else if (cards.filter(x => !x.reveal).length > 0) {
+        cards.filter(x => !x.reveal)[0].reveal = true;
+      }
+      else {
+        clearInterval(this.ui.render.draw.interval);
+        this.ui.render.draw.interval = 0;
+      }
+    }, 500);
+  }
+
+  resetHandVisibility() {
+    this.ui.hand.aiPlayer.visible = false;
+    this.ui.hand.player.visible = true;    
   }
 
   saveGame(response: any) {
     this.game = this.gameEngine.saveGame(response);
   }
 
-  showAllCards(game: any) {
-    var cards = game.player.cards as any[];
+  showAllCards(cards: any[]) {
     cards.forEach(x => {
       x.reveal = true;
       x.visible = true;
@@ -493,8 +581,10 @@ export class CardTable {
   }
 
   showdownSuccess(response: any) {
-    this.showAllCards(response);
+    this.showAllCards(response.aiPlayer.cards);
+    this.showAllCards(response.player.cards);
     this.saveGame(response);
+    this.aiPlayerHandClick();
     this.renderAlert(response.alert);
     this.unlockUI();
   }

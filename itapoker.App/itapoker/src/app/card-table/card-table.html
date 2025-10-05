@@ -28,7 +28,7 @@
     </div>
 
     <div class="card-table-content">
-        <div class="card-table-player-hand" *ngIf="!playerHandEnabled()">
+        <div class="card-table-player-hand" *ngIf="!playerHandEnabled() && !aiPlayerHandEnabled()">
             <div class="end">
                 <br *ngIf="!ui.render.anteUp.enabled()" />
                 <div *ngIf="ui.render.anteUp.enabled()" class="card-table-bets">
@@ -72,6 +72,7 @@
                 </div>
             </div>
             <div *ngFor="let card of game.player.cards; let i = index" class="card">
+                <br *ngIf="!card.visible" />
                 <img *ngIf="card.visible" src="{{ getCardUrl(card) }}" alt="{{ card.title }}" (click)="cardClick(card.rank, card.suit)" />
                 <span *ngIf="card.hold">HOLD</span>
             </div>
@@ -86,13 +87,21 @@
                 </div>
             </div>
         </div>
+        <div class="card-table-player-hand" *ngIf="aiPlayerHandEnabled()">
+            <div class="end"><br /></div>
+            <div *ngFor="let card of game.aiPlayer.cards; let i = index" class="card">
+                <br *ngIf="!card.visible" />
+                <img *ngIf="card.visible" src="{{ getCardUrl(card) }}" alt="{{ card.title }}" />
+            </div>
+            <div class="end"><br /></div>
+        </div>
     </div>
 
     <div class="card-table-sub-footer">
         <div class="card-table-sub-footer-left">
             <h5 *ngIf="aiPlayerBetEnabled()">${{ getAIPlayerBet() }}</h5>
             <h5 *ngIf="aiPlayerLastBetEnabled()">${{ game.aiPlayer.lastBetAmount }} <span>{{ game.aiPlayer.lastBetTypeTitle }}</span></h5>
-            <h4 *ngIf="gameOverEnabled()">{{ game.aiPlayer.hand }}</h4>
+            <h4 *ngIf="gameOverEnabled()" (click)="aiPlayerHandClick()">{{ game.aiPlayer.hand }}</h4>
             <br *ngIf="!aiPlayerBetEnabled() && !aiPlayerLastBetEnabled() && !gameOverEnabled()" />
         </div>
         <div class="card-table-sub-footer-centre">
@@ -106,7 +115,7 @@
         <div class="card-table-sub-footer-right">
             <h5 *ngIf="playerBetEnabled()">${{ getPlayerBet() }}</h5>
             <h5 *ngIf="playerLastBetEnabled()">${{ game.player.lastBetAmount }} <span>{{ game.player.lastBetTypeTitle }}</span></h5>
-            <h4 *ngIf="gameOverEnabled()">{{ game.player.hand }}</h4>
+            <h4 *ngIf="gameOverEnabled()" (click)="playerHandClick()">{{ game.player.hand }}</h4>
             <br *ngIf="!playerBetEnabled() && !gameOverEnabled()" />
         </div>
     </div>

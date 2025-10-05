@@ -32,7 +32,7 @@ export class Validator {
       return false;
 
     return true;
-  }  
+  }
   
   holdOK(game: any, ui: any) {
 
@@ -42,7 +42,19 @@ export class Validator {
       return false;
 
     // cards can only be held during draw
+
     return game.stage == 5;
+  }
+
+  playerHandClick(game: any) {
+
+    // player hand switching is only allowed when game stage 
+    // is game over
+
+    if (game.stage != 8)
+      return false;
+
+    return true;
   }
 
   removeChipOK(game: any, ui: any) {
