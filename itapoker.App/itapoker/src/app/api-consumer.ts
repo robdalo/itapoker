@@ -22,8 +22,9 @@ export class ApiConsumer {
   
   baseUrl = "http://localhost:5174/";
 
-  constructor(
-    private http: HttpClient) {
+  constructor(private http: HttpClient) {
+    var baseUrl = this.getBaseUrl();
+    this.baseUrl = baseUrl ? baseUrl : this.baseUrl;
   }
 
   addChip(
@@ -135,6 +136,10 @@ export class ApiConsumer {
     return this.baseUrl + this.apiEndpoints[name];
   }
 
+  getBaseUrl() {
+    return localStorage.getItem("baseUrl") ?? "";
+  }
+
   hold(
     gameId: string,
     rank: number,
@@ -209,6 +214,12 @@ export class ApiConsumer {
       error: error => errorCallback(error),
       complete: () => {}
     });
+  }
+
+  saveBaseUrl(baseUrl: string) {
+    localStorage.setItem("baseUrl", baseUrl);
+    this.baseUrl = this.getBaseUrl();
+    return this.baseUrl;
   }
 
   showdown(

@@ -1,0 +1,21 @@
+<div class="card-table">
+    <div class="card-table-header">
+        <div class="card-table-header-left"><br /></div>
+        <div class="card-table-header-centre">
+            <h4>Settings</h4>
+        </div>
+        <div class="card-table-header-right"><br /></div>
+    </div>
+
+    <div class="card-table-content">
+        <input type="text" [(ngModel)]="ui.baseUrl" placeholder="API Address" size="40" maxlength="50" />
+    </div>
+
+    <div class="card-table-footer">
+        <div class="card-table-footer-left"><br /></div>
+        <div class="card-table-footer-centre">
+            <button type="button" (click)="btnSaveClick()">Save</button>
+        </div>
+        <div class="card-table-footer-right"><br /></div>
+    </div>
+</div>
