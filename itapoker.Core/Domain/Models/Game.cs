@@ -21,6 +21,5 @@ public class Game
     public List<Card> Deck { get; set; } = new();
     public Player Player => Players.First(x => x.PlayerType == PlayerType.Human);
     public Player AIPlayer => Players.First(x => x.PlayerType == PlayerType.Computer);
-    public List<Chip> AnteChips => new() { new(5) { Quantity = 1 } };
-    public List<Chip> BetChips => new() { new(5), new(10), new(25), new(50) };
+    public List<Chip> BetChips { get; set; } = new();
 }

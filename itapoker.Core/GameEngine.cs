@@ -4,6 +4,7 @@ using itapoker.Core.Domain.Requests;
 using itapoker.Core.Interfaces;
 using itapoker.Core.Repositories.Interfaces;
 using itapoker.Core.Services.Interfaces;
+using Microsoft.Extensions.Options;
 
 namespace itapoker.Core;
 
@@ -13,17 +14,20 @@ public class GameEngine : IGameEngine
     private readonly ICardService _cardService;
     private readonly IDecisionService _decisionService;
     private readonly IGameRepo _gameRepo;
+    private readonly GameSettings _settings;
 
     public GameEngine(
         IBetService betService,
         ICardService cardService,
         IDecisionService decisionService,
-        IGameRepo gameRepo)
+        IGameRepo gameRepo,
+        IOptions<GameSettings> settings)
     {
         _betService = betService;
         _cardService = cardService;
         _decisionService = decisionService;
         _gameRepo = gameRepo;
+        _settings = settings.Value;
     }
 
     public Game AddChip(AddChipRequest request)
@@ -55,11 +59,7 @@ public class GameEngine : IGameEngine
 
         var game = _gameRepo.GetByGameId(request.GameId);
 
-        foreach (var player in game.Players)
-        {
-            player.Cash -= game.Ante;
-            game.Pot += game.Ante;
-        }
+        game = _betService.ProcessAnteUp(game);
 
         game.Stage = GameStage.Deal;
 
@@ -154,11 +154,12 @@ public class GameEngine : IGameEngine
             // determine hand
 
             player.HandType = _cardService.GetHandType(player.Cards);
-            
+
             // clear previous bets
 
             player.LastBetAmount = 0;
             player.LastBetType = BetType.None;
+            player.LastBetChips = new();
         }
 
         game.Stage = GameStage.BetPreDraw;
@@ -351,8 +352,7 @@ public class GameEngine : IGameEngine
     {
         _gameRepo.Truncate();
 
-        var game = new Game
-        {
+        var game = new Game {
             GameId = Guid.NewGuid().ToString(),
             Hand = 1,
             Stage = GameStage.Ante,
@@ -374,7 +374,8 @@ public class GameEngine : IGameEngine
                     PlayerType = PlayerType.Computer,
                     Cash = Math.Max(request.Cash, 500)
                 }
-            }
+            },
+            BetChips = _settings.Chips
         };
 
         return _gameRepo.AddOrUpdate(game);

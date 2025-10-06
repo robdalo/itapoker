@@ -120,7 +120,7 @@ export class CardTable {
   }
 
   anteUpSuccess(response: any) {
-    this.renderAnteUp();
+    this.renderAnteUp(response);
     var wait = setInterval(() => {
       if (this.ui.render.anteUp.interval == 0) {
         clearInterval(wait);
@@ -438,34 +438,35 @@ export class CardTable {
     }, 10000);
   }
 
-  renderAnteUp() {
+  renderAnteUp(response: any) {
     
-    this.game.player.chips = JSON.parse(JSON.stringify(this.game.anteChips));
-    this.game.aiPlayer.chips = JSON.parse(JSON.stringify(this.game.anteChips));
+    this.game.player.chips = JSON.parse(JSON.stringify(response.player.lastBetChips));
+    this.game.aiPlayer.chips = JSON.parse(JSON.stringify(response.aiPlayer.lastBetChips));
 
-    var index = 0;
+    var playerChips = this.game.player.chips as any[];
+    var aiPlayerChips = this.game.aiPlayer.chips as any[];
+
     var renderAIPlayer = false;
 
     this.ui.render.anteUp.interval = setInterval(() => {
       if (!renderAIPlayer) {
-        if (index >= this.game.anteChips.length) {        
-          index = 0;
+        if (playerChips.filter(x => !x.visible).length == 0) {
           renderAIPlayer = true;
         }
         else {
-          this.game.player.chips[index++].visible = true;
+          playerChips[0].visible = true;
         }
       }
       else {
-        if (index >= this.game.anteChips.length) {
+        if (aiPlayerChips.filter(x => !x.visible).length == 0) {
           clearInterval(this.ui.render.anteUp.interval);
           this.ui.render.anteUp.interval = 0;
           this.game.player.chips = [];
           this.game.aiPlayer.chips = [];
         }
         else {
-          this.game.aiPlayer.chips[index++].visible = true;
-        }       
+          aiPlayerChips[0].visible = true;
+        }
       }
     }, 1000);
   }

@@ -33,6 +33,7 @@ public class GameRepo : IGameRepo
         existing.Deck = game.Deck;
         existing.NextBetType = game.NextBetType;
         existing.NextBetAmount = game.NextBetAmount;
+        existing.BetChips = game.BetChips;
 
         collection.Upsert(existing);
 

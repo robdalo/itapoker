@@ -18,6 +18,5 @@ public class Game
     public List<Player> Players { get; set; } = new();
     public Player Player { get; set; }
     public Player AIPlayer { get; set; }
-    public List<Chip> AnteChips { get; set; }
     public List<Chip> BetChips { get; set; }
 }

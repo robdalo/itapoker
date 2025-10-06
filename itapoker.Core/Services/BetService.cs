@@ -1,7 +1,6 @@
 using itapoker.Core.Domain.Enums;
 using itapoker.Core.Domain.Models;
 using itapoker.Core.Services.Interfaces;
-using itapoker.Shared.Consumers;
 using Microsoft.Extensions.Options;
 
 namespace itapoker.Core.Services;
@@ -15,6 +14,18 @@ public class BetService : IBetService
     {
         _decisionService = decisionService;
         _settings = settings.Value;
+    }
+
+    public Game ProcessAnteUp(Game game)
+    {
+        foreach (var player in game.Players)
+        {
+            player.Cash -= game.Ante;
+            game.Pot += game.Ante;
+            player.LastBetChips = GetChips(game.Ante);
+        }
+
+        return game;
     }
 
     public Game ProcessAIPlayerBet(Game game)
